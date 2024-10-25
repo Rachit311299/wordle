@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:wordle/widgets/wordle_grid_element.dart';
 
-const wordsize=5;
+
 
 class WordleRow extends StatelessWidget {
-  const WordleRow({super.key});
+ final int wordsize;
+ const WordleRow({super.key, required this.wordsize});
 
   @override
   Widget build(BuildContext context) {

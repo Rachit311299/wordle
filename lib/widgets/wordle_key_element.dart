@@ -8,16 +8,16 @@ class WordleKeyElement extends StatelessWidget {
   Widget build(BuildContext context) {
 
     Widget KeyCap;
-    double width= 60;
+    double width= 55;
 
     if(letter =="_") {
-      KeyCap=const Icon(Icons.keyboard_return,size: 20,);
+      KeyCap=const Icon(Icons.keyboard_return,size: 18,);
     }
     else if(letter=="+"){
-      KeyCap=const Icon(Icons.backspace_outlined, size: 20,);
+      KeyCap=const Icon(Icons.backspace_outlined, size: 18,);
     }
     else{
-      width=40;
+      width=35;
       KeyCap= Text(letter, style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
@@ -27,7 +27,7 @@ class WordleKeyElement extends StatelessWidget {
 
     return Container(
       width: width,
-      height: 60,
+      height: 50,
       
       alignment: Alignment.center,
       padding: const EdgeInsets.all(10),

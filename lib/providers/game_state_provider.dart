@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/data/wordle_repo.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
 
+
 class GameState{
   final GameSettings settings;
   final List<String> validWords;
@@ -58,20 +59,36 @@ final Random rng=Random();
     }
 
     void updateCurrentAttempt(String key){
-      if(key=="_"){
-
-      }
-      else if(key=="+"){
-
-      }
-      else{
-        final attempts=state.attempts;
+       final attempts=state.attempts;
         if(attempts.length <=state.attempted){
           attempts.add("");
         }
         var currentAttempt=attempts[state.attempted];
+      
+      if(key=="_"){
+        if(currentAttempt.length<state.settings.wordsize){
+          print("attemp word incomplete");
+          return;
+        }
+        state=state.clone(
+          attempted: state.attempted+1
+        );
+
+      }
+      else if(key=="+"){
+        if(currentAttempt.isEmpty){
+          print("cannotbackspace");
+          return;
+        }
+        currentAttempt =currentAttempt.substring(0,currentAttempt.length-1);
+        attempts[state.attempted]=currentAttempt;
+        state=state.clone(
+          attempts: attempts
+        );
+      }
+      else{
         if(currentAttempt.length>state.settings.wordsize){
-          print("bigger tahn size");
+          print("bigger than size");
           return;
         }
         currentAttempt=currentAttempt += key;

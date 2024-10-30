@@ -20,30 +20,26 @@ class WordleKeyElement extends ConsumerWidget {
     }
     else{
       width=35;
-      KeyCap= Text(letter, style: const TextStyle(
+      KeyCap= Text(letter.toUpperCase(), style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
 
       ),);
     }
-
-    return Container(
-      width: width,
-      height: 50,
-      
-      alignment: Alignment.center,
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.all(3),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-        color: Color.fromARGB(44, 44, 44, 44)
-      ),
-      child: InkWell(
-        onTap: (){
-          ref.read(gameStateProvider.notifier).updateCurrentAttempt(letter);
-        },
-        child: KeyCap,
-      ),
+    return InkWell(
+      onTap: () {
+        ref.read(gameStateProvider.notifier).updateCurrentAttempt(letter);
+      },
+      child: Container(
+          width: width,
+          height: 50,
+          alignment: Alignment.center,
+          margin: const EdgeInsets.all(3),
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: Color.fromARGB(44, 44, 44, 44)),
+          child: KeyCap),
     );
+ 
   } 
 }

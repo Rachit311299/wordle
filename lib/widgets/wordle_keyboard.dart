@@ -12,19 +12,19 @@ class WordleKeyboard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            for(var i in "QWERTYUIOP".split("")) WordleKeyElement(letter: i)
+            for(var i in "qwertyuiop".split("")) WordleKeyElement(letter: i)
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            for(var i in "ASDFGHJKL".split("")) WordleKeyElement(letter: i)
+            for(var i in "asdfghjkl".split("")) WordleKeyElement(letter: i)
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-           for(var i in "_ZXCVBNM+".split("")) WordleKeyElement(letter: i)
+           for(var i in "_zxcvbnm+".split("")) WordleKeyElement(letter: i)
           ],
         ),
       ],

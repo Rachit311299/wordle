@@ -1,25 +1,30 @@
 name: Flutter Web
+
 on:
   push:
     branches:
       - master
+
+permissions:
+  contents: write  # Grant write permission to GITHUB_TOKEN
 
 jobs:
   build:
     name: Build Web and Deploy
     runs-on: ubuntu-latest
     env:
-      BASE_HREF: /${{ github.event.repository.name }}/
+      BASE_HREF: /wordle/
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.3'
           channel: 'stable'
       - run: flutter build web --release --web-renderer html --base-href $BASE_HREF
-      - name: Deply gh-pages
+      - name: Deploy gh-pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
+          force_orphan: true

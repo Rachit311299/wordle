@@ -1,8 +1,9 @@
 # wordle
 
-A new Flutter project.
+A wordle app
 
 ## Getting Started
+
 
 This project is a starting point for a Flutter application.
 

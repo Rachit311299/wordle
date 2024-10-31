@@ -1,13 +1,12 @@
-name: Flutter Web 
+name: Flutter Web Publish
 
 on:
   push:
     branches:
-      - main  # Change this to your default branch if it's not `main`
+      - master  # Set to master if that's your default branch
 
 jobs:
   build:
-    name: Build Web and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -17,8 +16,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.0.0' # Replace with your Flutter version
-          channel: 'stable'
+          flutter-version: '3.0.0'  # Replace with your Flutter version
 
       - name: Install dependencies
         run: flutter pub get
@@ -26,4 +24,8 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web --release
 
-
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web

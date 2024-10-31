@@ -67,6 +67,9 @@ flutter:
     - assets/4-letter-words.json
     - assets/5-letter-words.json
     - assets/6-letter-words.json
+    - assets/4-letter-words-bank.json
+    - assets/5-letter-words-bank.json
+    - assets/6-letter-words-bank.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

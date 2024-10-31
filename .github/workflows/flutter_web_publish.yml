@@ -11,12 +11,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  # Updated to the latest version
+        uses: actions/checkout@v3
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.3'  # Ensure this matches your Flutter SDK version
+          flutter-version: '3.17.0'  # Update to a beta version that includes Dart SDK 3.5.3
+          channel: 'beta'            # Switch to the beta channel
 
       - name: Install dependencies
         run: flutter pub get

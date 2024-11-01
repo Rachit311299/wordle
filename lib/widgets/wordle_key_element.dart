@@ -28,7 +28,7 @@ class WordleKeyElement extends ConsumerWidget {
     }
     return InkWell(
       onTap: () {
-        ref.read(gameStateProvider.notifier).updateCurrentAttempt(letter);
+        ref.read(gameStateProvider.notifier).updateCurrentAttempt(context,letter);
       },
       child: Container(
           width: width,

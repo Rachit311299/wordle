@@ -15,7 +15,7 @@ class WordleGrid extends ConsumerWidget {
 
     final gameSettings=ref.watch(GameSettingsProvider);
     final gameState=ref.watch(gameStateProvider);
-    // print("new words ${gameState.correctWord}");
+    print("new words ${gameState.correctWord}");
 
 
     final wordSize = gameSettings.wordsize;

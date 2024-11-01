@@ -1,38 +1,50 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/data/wordle_repo.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
+import 'package:wordle/widgets/custom_toast.dart';
 
 
-class GameState{
+
+class GameState {
   final GameSettings settings;
   final List<String> validWords;
   final List<String> wordBank;
   final String correctWord;
-  final List<String>attempts;
+  final List<String> attempts;
   final int attempted;
+  final bool gameOver; // New property to track if the game has ended
 
+  const GameState({
+    required this.wordBank,
+    required this.validWords,
+    required this.correctWord,
+    required this.settings,
+    required this.attempts,
+    required this.attempted,
+    this.gameOver = false,
+  });
 
-  const GameState( 
-      {required this.wordBank,
-        required this.validWords,
-      required this.correctWord,
-      required this.settings,
-      required this .attempts,
-      required this.attempted});
-
-  GameState clone({List<String>? validWords, String? correctWord,List<String>? attempts, int? attempted,  List<String>? wordBank}){
+  GameState clone({
+    List<String>? validWords,
+    String? correctWord,
+    List<String>? attempts,
+    int? attempted,
+    List<String>? wordBank,
+    bool? gameOver,
+  }) {
     return GameState(
-        wordBank: wordBank ?? this.wordBank,
-        validWords: validWords ?? this.validWords,
-        correctWord: correctWord ?? this.correctWord,
-        settings: this.settings,
-        attempts: attempts ?? this.attempts,
-        attempted: attempted ?? this.attempted);
+      wordBank: wordBank ?? this.wordBank,
+      validWords: validWords ?? this.validWords,
+      correctWord: correctWord ?? this.correctWord,
+      settings: this.settings,
+      attempts: attempts ?? this.attempts,
+      attempted: attempted ?? this.attempted,
+      gameOver: gameOver ?? this.gameOver,
+    );
   }
 }
-
-
 
 class GameStateNotifier extends StateNotifier<GameState> {
   final Random rng = Random();
@@ -54,8 +66,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final vword = wordData["vdata"]!;
 
     state = state.clone(
-      validWords: words, // Main word list for valid guesses
-      wordBank: vword,   // Source for validation of attempted words
+      validWords: words,
+      wordBank: vword,
       correctWord: words[rng.nextInt(words.length - 1)],
     );
   }
@@ -66,14 +78,17 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  void updateCurrentAttempt(String key) {
+  void updateCurrentAttempt(BuildContext context,String key) {
+    // If the game is over, ignore further input
+    if (state.gameOver) return;
+
     final attempts = state.attempts;
     if (attempts.length <= state.attempted) {
       attempts.add("");
     }
     var currentAttempt = attempts[state.attempted];
 
-    if (key == "_") {
+    if (key == "_") { // Enter Button
       if (currentAttempt.length < state.settings.wordsize) {
         print("Attempt word incomplete");
         return;
@@ -84,10 +99,37 @@ class GameStateNotifier extends StateNotifier<GameState> {
         return;
       }
 
+      
+
       state = state.clone(
         attempted: state.attempted + 1,
       );
-    } else if (key == "+") {
+
+      if (currentAttempt == state.correctWord) {
+         // Win condition
+            state = state.clone(
+              gameOver: true, // Mark game as over
+            );
+            CustomToast.show(
+              context,
+              "Great! You've solved",
+              backgroundColor: Colors.green,
+            );
+        return;
+      }
+      if(state.settings.attempts==state.attempted){
+             state = state.clone(
+              gameOver: true, // Mark game as over
+            );
+            CustomToast.show(
+                context,
+                "Game Over",
+                backgroundColor: Colors.red,
+            );
+            return;
+      }
+
+    } else if (key == "+") { // Backspace Button
       if (currentAttempt.isEmpty) {
         print("Cannot backspace");
         return;
@@ -111,6 +153,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     }
   }
 }
+
 
 final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((ref) {
   final settings = ref.watch(GameSettingsProvider);

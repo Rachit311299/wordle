@@ -10,7 +10,7 @@ class WordlePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(top: 55.0, bottom: 55.0), // Adds 40px space at the top
+        padding: const EdgeInsets.only(top: 50.0, bottom: 55.0), // Adds 40px space at the top
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

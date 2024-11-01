@@ -28,13 +28,13 @@ class _CustomToastState extends State<CustomToast> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 50.0,
+      top: 100.0,
       left: MediaQuery.of(context).size.width * 0.1,
       width: MediaQuery.of(context).size.width * 0.8,
       child: Material(
         color: Colors.transparent,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
           decoration: BoxDecoration(
             color: widget.backgroundColor.withOpacity(0.9),
             borderRadius: BorderRadius.circular(8.0),

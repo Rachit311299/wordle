@@ -9,14 +9,19 @@ class WordlePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:Container(
-        child: const Column(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 55.0, bottom: 55.0), // Adds 40px space at the top
+        child: Column(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment:MainAxisAlignment.spaceBetween ,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [WordleTitleBar(),WordleGrid(),WordleKeyboard(),],
+          children: const [
+            WordleTitleBar(),
+            WordleGrid(),
+            WordleKeyboard(),
+          ],
         ),
-      )
+      ),
     );
   }
 }

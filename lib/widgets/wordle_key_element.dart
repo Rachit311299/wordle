@@ -10,7 +10,7 @@ class WordleKeyElement extends ConsumerWidget {
   Widget build(BuildContext context,WidgetRef ref) {
 
     Widget KeyCap;
-    double width= 55;
+    double width= 50;
 
     if(letter =="_") {
       KeyCap=const Icon(Icons.keyboard_return,size: 18,);
@@ -19,7 +19,7 @@ class WordleKeyElement extends ConsumerWidget {
       KeyCap=const Icon(Icons.backspace_outlined, size: 18,);
     }
     else{
-      width=35;
+      width=32;
       KeyCap= Text(letter.toUpperCase(), style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
@@ -32,7 +32,7 @@ class WordleKeyElement extends ConsumerWidget {
       },
       child: Container(
           width: width,
-          height: 50,
+          height: 48,
           alignment: Alignment.center,
           margin: const EdgeInsets.all(3),
           decoration: const BoxDecoration(

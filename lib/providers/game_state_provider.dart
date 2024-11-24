@@ -6,7 +6,6 @@ import 'package:wordle/providers/game_settings_provider.dart';
 import 'package:wordle/widgets/custom_toast.dart';
 
 
-
 class GameState {
   final GameSettings settings;
   final List<String> validWords;
@@ -14,7 +13,8 @@ class GameState {
   final String correctWord;
   final List<String> attempts;
   final int attempted;
-  final bool gameOver; // New property to track if the game has ended
+  final bool gameOver; // Tracks if the game has ended
+  final Map<String, String> keyStates; // Tracks keyboard letter states
 
   const GameState({
     required this.wordBank,
@@ -24,6 +24,7 @@ class GameState {
     required this.attempts,
     required this.attempted,
     this.gameOver = false,
+    this.keyStates = const {},
   });
 
   GameState clone({
@@ -33,6 +34,7 @@ class GameState {
     int? attempted,
     List<String>? wordBank,
     bool? gameOver,
+    Map<String, String>? keyStates,
   }) {
     return GameState(
       wordBank: wordBank ?? this.wordBank,
@@ -42,6 +44,7 @@ class GameState {
       attempts: attempts ?? this.attempts,
       attempted: attempted ?? this.attempted,
       gameOver: gameOver ?? this.gameOver,
+      keyStates: keyStates ?? this.keyStates,
     );
   }
 }
@@ -78,8 +81,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  void updateCurrentAttempt(BuildContext context,String key) {
-    // If the game is over, ignore further input
+  void updateCurrentAttempt(BuildContext context, String key) {
     if (state.gameOver) return;
 
     final attempts = state.attempts;
@@ -88,7 +90,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
     }
     var currentAttempt = attempts[state.attempted];
 
-    if (key == "_") { // Enter Button
+    if (key == "_") {
+      // Enter Button
       if (currentAttempt.length < state.settings.wordsize) {
         print("Attempt word incomplete");
         return;
@@ -99,37 +102,39 @@ class GameStateNotifier extends StateNotifier<GameState> {
         return;
       }
 
-      
+      // Update key states after the word is submitted
+      _updateKeyStates(currentAttempt);
 
       state = state.clone(
         attempted: state.attempted + 1,
       );
 
       if (currentAttempt == state.correctWord) {
-         // Win condition
-            state = state.clone(
-              gameOver: true, // Mark game as over
-            );
-            CustomToast.show(
-              context,
-              "Great! You've solved",
-              backgroundColor: Colors.green,
-            );
+        // Win condition
+        state = state.clone(
+          gameOver: true,
+        );
+        CustomToast.show(
+          context,
+          "Great! You've solved",
+          backgroundColor: Colors.green,
+        );
         return;
       }
-      if(state.settings.attempts==state.attempted){
-             state = state.clone(
-              gameOver: true, // Mark game as over
-            );
-            CustomToast.show(
-                context,
-                "Game Over",
-                backgroundColor: Colors.red,
-            );
-            return;
-      }
 
-    } else if (key == "+") { // Backspace Button
+      if (state.settings.attempts == state.attempted) {
+        state = state.clone(
+          gameOver: true,
+        );
+        CustomToast.show(
+          context,
+          "Game Over",
+          backgroundColor: Colors.red,
+        );
+        return;
+      }
+    } else if (key == "+") {
+      // Backspace Button
       if (currentAttempt.isEmpty) {
         print("Cannot backspace");
         return;
@@ -140,6 +145,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
         attempts: attempts,
       );
     } else {
+      // Regular Letter
       if (currentAttempt.length >= state.settings.wordsize) {
         print("Word is bigger than allowed size");
         return;
@@ -152,8 +158,33 @@ class GameStateNotifier extends StateNotifier<GameState> {
       );
     }
   }
-}
 
+  void _updateKeyStates(String attemptedWord) {
+    final keyStates = Map<String, String>.from(state.keyStates);
+
+    for (int i = 0; i < attemptedWord.length; i++) {
+      final letter = attemptedWord[i];
+
+      if (state.correctWord[i] == letter) {
+        keyStates[letter] = 'green'; // Correct letter, correct position
+      } else if (state.correctWord.contains(letter)) {
+        // Only mark as orange if not already green
+        if (keyStates[letter] != 'green') {
+          keyStates[letter] = 'orange'; // Correct letter, wrong position
+        }
+      } else {
+        // Only mark as grey if not already orange or green
+        if (keyStates[letter] != 'green' && keyStates[letter] != 'orange') {
+          keyStates[letter] = 'grey'; // Letter not in the word
+        }
+      }
+    }
+
+    state = state.clone(
+      keyStates: keyStates,
+    );
+  }
+}
 
 final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((ref) {
   final settings = ref.watch(GameSettingsProvider);

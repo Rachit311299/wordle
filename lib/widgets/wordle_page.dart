@@ -9,17 +9,28 @@ class WordlePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(top: 50.0, bottom: 55.0), // Adds 40px space at the top
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: const [
-            WordleTitleBar(),
-            WordleGrid(),
-            WordleKeyboard(),
-          ],
+      backgroundColor: Colors.grey[300], // Set background outside the container to grey
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 500, // Restrict to mobile width
+          ),
+          child: Container(
+            color: Colors.white, // Color inside the container (Wordle app area)
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10.0, bottom: 55.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  WordleTitleBar(),
+                  WordleGrid(),
+                  WordleKeyboard(),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

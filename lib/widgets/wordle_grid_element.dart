@@ -28,8 +28,8 @@ class WordleGridElement extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Container(
-      width: 60,
-      height: 60,
+      width: 50,
+      height: 50,
       alignment: Alignment.center,
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.all(2),

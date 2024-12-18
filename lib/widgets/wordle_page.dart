@@ -8,31 +8,51 @@ class WordlePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[300], // Set background outside the container to grey
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 500, // Restrict to mobile width
+    // Get the screen width
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // The content of our app
+    Widget content = Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          child: Container(
-            color: Colors.white, // Color inside the container (Wordle app area)
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10.0, bottom: 55.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  WordleTitleBar(),
-                  WordleGrid(),
-                  WordleKeyboard(),
-                ],
-              ),
-            ),
-          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: const [
+            WordleTitleBar(),
+            WordleGrid(),
+            WordleKeyboard(),
+          ],
         ),
       ),
+    );
+
+    // If screen width is greater than 500, wrap in ConstrainedBox
+    if (screenWidth > 500) {
+      content = Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 500,
+          ),
+          child: content,
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+      body: content,
     );
   }
 }

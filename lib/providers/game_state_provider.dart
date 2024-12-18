@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/data/wordle_repo.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
+import 'package:wordle/widgets/correctword_overlay.dart';
 import 'package:wordle/widgets/custom_toast.dart';
-
 
 class GameState {
   final GameSettings settings;
@@ -126,11 +126,18 @@ class GameStateNotifier extends StateNotifier<GameState> {
         state = state.clone(
           gameOver: true,
         );
+        final overlay = CorrectWordOverlay(
+          correctWord: state.correctWord,
+        );
+        overlay.show(context);
+
         CustomToast.show(
           context,
           "Game Over",
           backgroundColor: Colors.red,
         );
+        // CorrectWordOverlay.show(context,
+        // );
         return;
       }
     } else if (key == "+") {
@@ -186,7 +193,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 }
 
-final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((ref) {
+final gameStateProvider =
+    StateNotifierProvider<GameStateNotifier, GameState>((ref) {
   final settings = ref.watch(GameSettingsProvider);
   final gameStateNotifier = GameStateNotifier(settings);
   gameStateNotifier.updateWords();

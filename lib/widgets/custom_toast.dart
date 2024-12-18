@@ -17,7 +17,7 @@ class CustomToast extends StatefulWidget {
     final overlayEntry = OverlayEntry(
       builder: (context) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final toastWidth = 300.0; // Fixed width for the toast
+        final toastWidth = 200.0; // Fixed width for the toast
         final leftPosition = (screenWidth - toastWidth) / 2; // Center the toast
 
         return Positioned(
@@ -81,8 +81,8 @@ class _CustomToastState extends State<CustomToast>
       child: Material(
         color: Colors.transparent,
         child: Container(
-          width: 300, // Fixed width for the toast
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
+          width: 250, // Fixed width for the toast
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 15.0),
           decoration: BoxDecoration(
             color: widget.backgroundColor.withOpacity(0.9),
             borderRadius: BorderRadius.circular(8.0),

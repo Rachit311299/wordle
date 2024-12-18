@@ -17,8 +17,7 @@ class WordleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Only calculate colors if the word has been submitted
-    final List<Color?> colors = attempted ? _getColorsForRow() : List.filled(wordsize, null);
+    final List<Color?> colors = attempted ? _getColorsForRow(context) : List.filled(wordsize, null);
 
     final List<WordleGridElement> boxes = List.generate(wordsize, (j) {
       final letter = (word.length > j) ? word[j] : "";
@@ -26,7 +25,7 @@ class WordleRow extends StatelessWidget {
         pos: j,
         letter: letter,
         attempted: attempted,
-        color: colors[j], // Pass the calculated color
+        color: colors[j],
       );
     });
 
@@ -36,36 +35,42 @@ class WordleRow extends StatelessWidget {
     );
   }
 
- List<Color?> _getColorsForRow() {
-  final List<Color?> colors = List.filled(wordsize, Colors.grey); // Default to grey
-  final Map<String, int> remainingCounts = {};
+  List<Color?> _getColorsForRow(BuildContext context) {
+    // Initialize with theme-aware grey color
+    final Color defaultGrey = Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[700]! // Darker grey for dark mode
+        : const Color.fromARGB(255, 100, 100, 100); // Original grey for light mode
 
-  // Step 1: Count occurrences of each letter in the correct word
-  for (var char in correctWord.split('')) {
-    remainingCounts[char] = (remainingCounts[char] ?? 0) + 1;
-  }
+    final List<Color?> colors = List.filled(wordsize, defaultGrey);
+    final Map<String, int> remainingCounts = {};
 
-  // Step 2: Mark green matches and reduce counts
-  for (int i = 0; i < word.length; i++) {
-    if (word[i] == correctWord[i]) {
-      colors[i] = Colors.green;
-      remainingCounts[word[i]] = remainingCounts[word[i]]! - 1;
+    // Count occurrences of each letter in the correct word
+    for (var char in correctWord.split('')) {
+      remainingCounts[char] = (remainingCounts[char] ?? 0) + 1;
     }
-  }
 
-  // Step 3: Mark orange matches for misplaced letters
-  for (int i = 0; i < word.length; i++) {
-    if (colors[i] == Colors.grey && // Not already marked green
-        remainingCounts.containsKey(word[i]) &&
-        remainingCounts[word[i]]! > 0) {
-      colors[i] = Colors.orangeAccent;
-      remainingCounts[word[i]] = remainingCounts[word[i]]! - 1; // Reduce count
+    // Define semantic colors that work well in both themes
+    final correctColor = Colors.green[600]!; // Slightly darker green for better contrast
+    final misplacedColor = Colors.orange[400]!; // Adjusted orange for better visibility
+
+    // Mark green matches and reduce counts
+    for (int i = 0; i < word.length; i++) {
+      if (word[i] == correctWord[i]) {
+        colors[i] = correctColor;
+        remainingCounts[word[i]] = remainingCounts[word[i]]! - 1;
+      }
     }
+
+    // Mark orange matches for misplaced letters
+    for (int i = 0; i < word.length; i++) {
+      if (colors[i] == defaultGrey && // Not already marked green
+          remainingCounts.containsKey(word[i]) &&
+          remainingCounts[word[i]]! > 0) {
+        colors[i] = misplacedColor;
+        remainingCounts[word[i]] = remainingCounts[word[i]]! - 1;
+      }
+    }
+
+    return colors;
   }
-
-  return colors;
-}
-
-
-
 }

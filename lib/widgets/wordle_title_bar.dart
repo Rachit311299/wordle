@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
-
+import 'package:wordle/providers/theme_provider.dart';
 
 class WordleTitleBar extends StatelessWidget {
   const WordleTitleBar({super.key});
@@ -9,89 +9,158 @@ class WordleTitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child:const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          
-         WordAttemptToggle(),
-
-
-          Text("WORDLE",
-          style:TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-
+          Text(
+            "wordscape",
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          
-        WordSizeToggle()
+          Row(
+            children: const [
+              WordSizeToggle(),
+              SizedBox(width: 8),
+              WordAttemptToggle(),
+              SizedBox(width: 8),
+              ThemeToggleButton(),
+            ],
+          ),
         ],
       ),
     );
   }
 }
 
-class WordSizeToggle extends ConsumerWidget{
-  const WordSizeToggle({
-    Key? Key,
-  }) :super();
+class ThemeToggleButton extends ConsumerWidget {
+  const ThemeToggleButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
-    final gameSettings = ref.watch(GameSettingsProvider);
-    final gameSettingsNotifier = ref.watch(GameSettingsProvider.notifier);
+    final isDarkMode = ref.watch(themeProvider);
 
-    void _updateWordSize(){
-      var newWordSize=5;
-      if(gameSettings.wordsize==4) newWordSize=5;
-      if(gameSettings.wordsize==5) newWordSize=6;
-      if(gameSettings.wordsize==6) newWordSize=4;
-      gameSettingsNotifier.UpdateWordsize(newWordSize);
-    }
-
-    return Container(
-            child: OutlinedButton(
-              child: Text(gameSettings.wordsize.toString()),
-              onPressed: _updateWordSize,),
-            margin:const EdgeInsets.fromLTRB(40, 0, 0 , 0),
-          );
+    return SizedBox(
+      width: 50,
+      height: 30,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          side: BorderSide(color: Theme.of(context).colorScheme.outline),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.zero,
+        ),
+        onPressed: () {
+          ref.read(themeProvider.notifier).toggleTheme();
+        },
+        child: Icon(
+          isDarkMode ? Icons.light_mode : Icons.dark_mode,
+          size: 20,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
   }
 }
 
-class WordAttemptToggle extends ConsumerWidget{
-  const WordAttemptToggle({
-    Key? key,
-  }) : super(key: key);
+class WordSizeToggle extends ConsumerWidget {
+  const WordSizeToggle({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
     final gameSettings = ref.watch(GameSettingsProvider);
     final gameSettingsNotifier = ref.watch(GameSettingsProvider.notifier);
 
-    void _updateAttempts(){
-      var newAttempts=6;
-      if(gameSettings.attempts==4) newAttempts=5;
-      if(gameSettings.attempts==5) newAttempts=6;
-      if(gameSettings.attempts==6) newAttempts=4;
+    void _updateWordSize() {
+      var newWordSize = 5;
+      if (gameSettings.wordsize == 4) newWordSize = 5;
+      if (gameSettings.wordsize == 5) newWordSize = 6;
+      if (gameSettings.wordsize == 6) newWordSize = 4;
+      gameSettingsNotifier.UpdateWordsize(newWordSize);
+    }
+
+    return SizedBox(
+      width: 50,
+      height: 30,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          side: BorderSide(color: Theme.of(context).colorScheme.outline),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.zero,
+        ),
+        child: Text(
+          gameSettings.wordsize.toString(),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: _updateWordSize,
+      ),
+    );
+  }
+}
+
+class WordAttemptToggle extends ConsumerWidget {
+  const WordAttemptToggle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameSettings = ref.watch(GameSettingsProvider);
+    final gameSettingsNotifier = ref.watch(GameSettingsProvider.notifier);
+
+    void _updateAttempts() {
+      var newAttempts = 6;
+      if (gameSettings.attempts == 4) newAttempts = 5;
+      if (gameSettings.attempts == 5) newAttempts = 6;
+      if (gameSettings.attempts == 6) newAttempts = 4;
       gameSettingsNotifier.UpdateAttempts(newAttempts);
     }
+
     String difftext;
-    switch(gameSettings.attempts){
-      case 4: difftext ="HIGH";break;
-      case 5: difftext ="MED";break;
-      case 6: default: difftext ="LOW";break;
+    switch (gameSettings.attempts) {
+      case 4:
+        difftext = "HIGH";
+        break;
+      case 5:
+        difftext = "MED";
+        break;
+      case 6:
+      default:
+        difftext = "LOW";
+        break;
     }
 
-
-    return Container(
+    return SizedBox(
+      width: 50,
+      height: 30,
       child: OutlinedButton(
-        child: Text(difftext),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          side: BorderSide(color: Theme.of(context).colorScheme.outline),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.zero,
+        ),
+        child: Text(
+          difftext,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
         onPressed: _updateAttempts,
       ),
-      margin: const EdgeInsets.fromLTRB(0, 0, 30, 0),
     );
   }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wordle/providers/game_state_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:wordle/providers/game_state_provider.dart';
 
-class WordleKeyElement extends ConsumerWidget {
+class WordleKeyElement extends ConsumerStatefulWidget {
   final String letter;
   final String state;
 
@@ -13,26 +13,32 @@ class WordleKeyElement extends ConsumerWidget {
     this.state = 'default',
   });
 
+  @override
+  ConsumerState<WordleKeyElement> createState() => _WordleKeyElementState();
+}
+
+class _WordleKeyElementState extends ConsumerState<WordleKeyElement> {
+  bool _isPressed = false;
+
   Color getBgColor(BuildContext context) {
-    switch (state) {
+    switch (widget.state) {
       case 'green':
         return Colors.green;
       case 'orange':
         return Colors.orangeAccent;
       case 'grey':
-        // Darker grey for attempted but incorrect letters
         return Theme.of(context).brightness == Brightness.dark 
             ? Colors.grey[900]! 
             : Colors.grey[700]!;
       default:
-        // Lighter grey for non-attempted letters
         return Theme.of(context).brightness == Brightness.dark 
             ? Colors.grey[800]! 
             : const Color.fromARGB(44, 73, 73, 73);
     }
-}
+  }
+
   Color getTextColor(BuildContext context) {
-    if (state == 'default') {
+    if (widget.state == 'default') {
       return Theme.of(context).colorScheme.onSurface; 
     }
     return Colors.white; 
@@ -45,30 +51,30 @@ class WordleKeyElement extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     Widget keyCap;
     double width = 48;
 
-    if (letter == "_") {
+    if (widget.letter == "_") {
       keyCap = Icon(
         Icons.keyboard_return,
         size: 18,
-        color: state == 'default' 
+        color: widget.state == 'default' 
             ? getIconColor(context) 
             : Colors.white,
       );
-    } else if (letter == "+") {
+    } else if (widget.letter == "+") {
       keyCap = Icon(
         Icons.backspace_outlined,
         size: 18,
-        color: state == 'default' 
+        color: widget.state == 'default' 
             ? getIconColor(context) 
             : Colors.white,
       );
     } else {
       width = 30;
       keyCap = Text(
-        letter.toUpperCase(),
+        widget.letter.toUpperCase(),
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
@@ -77,31 +83,52 @@ class WordleKeyElement extends ConsumerWidget {
       );
     }
 
-    return InkWell(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        ref.read(gameStateProvider.notifier).updateCurrentAttempt(context, letter);
+    return Listener(
+      onPointerDown: (_) {
+        setState(() {
+          _isPressed = true;
+        });
       },
-      child: Container(
-        width: width,
-        height: 48,
-        alignment: Alignment.center,
-        margin: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(5)),
-          color: getBgColor(context),
-          // Add subtle shadow for better visibility in dark mode
-          boxShadow: Theme.of(context).brightness == Brightness.dark
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  )
-                ]
-              : null,
+      onPointerUp: (_) {
+        setState(() {
+          _isPressed = false;
+        });
+      },
+      onPointerCancel: (_) {
+        setState(() {
+          _isPressed = false;
+        });
+      },
+      child: AnimatedScale(
+        scale: _isPressed ? 0.85 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+        child: InkWell(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            ref.read(gameStateProvider.notifier).updateCurrentAttempt(context, widget.letter);
+          },
+          child: Container(
+            width: width,
+            height: 48,
+            alignment: Alignment.center,
+            margin: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              color: getBgColor(context),
+              boxShadow: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      )
+                    ]
+                  : null,
+            ),
+            child: keyCap,
+          ),
         ),
-        child: keyCap,
       ),
     );
   }

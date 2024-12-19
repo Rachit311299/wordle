@@ -78,9 +78,13 @@ class CorrectWordOverlay {
                               vertical: 8,
                             ),
                           ),
-                            child: const Text(
+                            child: Text(
                             'Close',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: theme.brightness == Brightness.dark 
+                                ? Colors.white 
+                                : Colors.black,
+                            ),
                             ),
                         ),
                       ],

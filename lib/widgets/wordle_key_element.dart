@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/providers/game_state_provider.dart';
+import 'package:flutter/services.dart';
 
 class WordleKeyElement extends ConsumerWidget {
   final String letter;
@@ -32,21 +33,21 @@ class WordleKeyElement extends ConsumerWidget {
 }
   Color getTextColor(BuildContext context) {
     if (state == 'default') {
-      return Theme.of(context).colorScheme.onSurface; // Use theme-aware text color
+      return Theme.of(context).colorScheme.onSurface; 
     }
-    return Colors.white; // Keep white for colored states
+    return Colors.white; 
   }
 
   Color getIconColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white70 // Slightly dimmed white for dark mode
-        : Colors.black87; // Slightly transparent black for light mode
+        ? Colors.white70 
+        : Colors.black87; 
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Widget keyCap;
-    double width = 50;
+    double width = 48;
 
     if (letter == "_") {
       keyCap = Icon(
@@ -65,7 +66,7 @@ class WordleKeyElement extends ConsumerWidget {
             : Colors.white,
       );
     } else {
-      width = 32;
+      width = 30;
       keyCap = Text(
         letter.toUpperCase(),
         style: TextStyle(
@@ -78,6 +79,7 @@ class WordleKeyElement extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
+        HapticFeedback.lightImpact();
         ref.read(gameStateProvider.notifier).updateCurrentAttempt(context, letter);
       },
       child: Container(

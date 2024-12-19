@@ -8,42 +8,41 @@ class WordlePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width
     final screenWidth = MediaQuery.of(context).size.width;
     
-    // The content of our app
-    Widget content = Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: const [
-            WordleTitleBar(),
-            WordleGrid(),
-            WordleKeyboard(),
+    Widget content = SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor.withOpacity(0.3),
+              blurRadius: 50,
+              offset: const Offset(0, 2),
+            ),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 15.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: const [
+              WordleTitleBar(),
+              WordleGrid(),
+              WordleKeyboard(),
+            ],
+          ),
         ),
       ),
     );
 
-    // If screen width is greater than 500, wrap in ConstrainedBox
-    if (screenWidth > 500) {
+    if (screenWidth > 1366) {
       content = Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxWidth: 500,
+            maxWidth: 1000,
           ),
           child: content,
         ),

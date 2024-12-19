@@ -17,11 +17,11 @@ class CustomToast extends StatefulWidget {
     final overlayEntry = OverlayEntry(
       builder: (context) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final toastWidth = 200.0; // Fixed width for the toast
-        final leftPosition = (screenWidth - toastWidth) / 2; // Center the toast
+        final toastWidth = 200.0; 
+        final leftPosition = (screenWidth - toastWidth) / 2; 
 
         return Positioned(
-          top: 100, // Adjust this to position the toast under the title
+          top: 100, 
           left: leftPosition,
           width: toastWidth,
           child: CustomToast(

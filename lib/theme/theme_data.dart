@@ -10,8 +10,7 @@ class AppTheme {
       primary: Colors.blue,
       secondary: Colors.blueAccent,
       surface: Colors.white,
-      background: Colors.white,
-      onBackground: Colors.black,
+      onSurface: Colors.black,
     ),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(color: Colors.black),

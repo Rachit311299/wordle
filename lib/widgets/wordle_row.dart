@@ -38,7 +38,7 @@ class WordleRow extends StatelessWidget {
   List<Color?> _getColorsForRow(BuildContext context) {
     // Initialize with theme-aware grey color
     final Color defaultGrey = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey[700]! // Darker grey for dark mode
+        ? Colors.grey[900]! // Darker grey for dark mode
         : const Color.fromARGB(255, 100, 100, 100); // Original grey for light mode
 
     final List<Color?> colors = List.filled(wordsize, defaultGrey);
@@ -63,7 +63,7 @@ class WordleRow extends StatelessWidget {
 
     // Mark orange matches for misplaced letters
     for (int i = 0; i < word.length; i++) {
-      if (colors[i] == defaultGrey && // Not already marked green
+      if (colors[i] == defaultGrey && 
           remainingCounts.containsKey(word[i]) &&
           remainingCounts[word[i]]! > 0) {
         colors[i] = misplacedColor;

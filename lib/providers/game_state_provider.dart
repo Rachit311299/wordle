@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/data/wordle_repo.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
+import 'package:wordle/widgets/confetti_overlay.dart';
 import 'package:wordle/widgets/correctword_overlay.dart';
 import 'package:wordle/widgets/custom_toast.dart';
+import 'package:flutter/services.dart';
 
 class GameState {
   final GameSettings settings;
@@ -81,7 +83,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  void updateCurrentAttempt(BuildContext context, String key) {
+  Future<void> updateCurrentAttempt(BuildContext context, String key) async {
     if (state.gameOver) return;
 
     final attempts = state.attempts;
@@ -99,6 +101,15 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
       if (!state.wordBank.contains(currentAttempt)) {
         print("Enter Valid Word");
+        CustomToast.show(
+          context,
+          "Not a valid word",
+          backgroundColor: const Color.fromARGB(255, 110, 110, 110),
+        );
+
+        // HapticFeedback.vibrate();
+        HapticFeedback.heavyImpact();
+       
         return;
       }
 
@@ -114,6 +125,9 @@ class GameStateNotifier extends StateNotifier<GameState> {
         state = state.clone(
           gameOver: true,
         );
+
+        ConfettiOverlay.show(context);
+        HapticFeedback.heavyImpact();
         CustomToast.show(
           context,
           "Great! You've solved",
@@ -136,8 +150,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
           "Game Over",
           backgroundColor: Colors.red,
         );
-        // CorrectWordOverlay.show(context,
-        // );
+        HapticFeedback.heavyImpact();
         return;
       }
     } else if (key == "+") {

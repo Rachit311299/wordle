@@ -20,7 +20,7 @@ class WordleKeyboard extends ConsumerWidget {
             for (var i in "qwertyuiop".split(""))
               WordleKeyElement(
                 letter: i,
-                state: letterStates[i] ?? 'default', // Pass the letter state
+                state: letterStates[i] ?? 'default', 
               ),
           ],
         ),
@@ -30,7 +30,7 @@ class WordleKeyboard extends ConsumerWidget {
             for (var i in "asdfghjkl".split(""))
               WordleKeyElement(
                 letter: i,
-                state: letterStates[i] ?? 'default', // Pass the letter state
+                state: letterStates[i] ?? 'default', 
               ),
           ],
         ),
@@ -40,7 +40,7 @@ class WordleKeyboard extends ConsumerWidget {
             for (var i in "_zxcvbnm+".split(""))
               WordleKeyElement(
                 letter: i,
-                state: letterStates[i] ?? 'default', // Pass the letter state
+                state: letterStates[i] ?? 'default', 
               ),
           ],
         ),

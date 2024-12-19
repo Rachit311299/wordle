@@ -18,12 +18,11 @@ class WordleGridElement extends StatefulWidget {
   State<WordleGridElement> createState() => _WordleGridElementState();
 }
 
-class _WordleGridElementState extends State<WordleGridElement> 
+class _WordleGridElementState extends State<WordleGridElement>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
-  String? _previousLetter;
-  
+
   @override
   void initState() {
     super.initState();
@@ -53,15 +52,12 @@ class _WordleGridElementState extends State<WordleGridElement>
   @override
   void didUpdateWidget(WordleGridElement oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
-    if (widget.letter != oldWidget.letter) {
-      if (widget.letter.isNotEmpty) {
-        _controller.reset();
-        _controller.forward();
-      }
-      _previousLetter = oldWidget.letter;
+
+    if (widget.letter != oldWidget.letter && widget.letter.isNotEmpty) {
+      _controller.reset();
+      _controller.forward();
     }
-    
+
     if (!oldWidget.attempted && widget.attempted) {
       _controller.reset();
       Future.delayed(Duration(milliseconds: widget.pos * 200), () {
@@ -70,33 +66,6 @@ class _WordleGridElementState extends State<WordleGridElement>
         }
       });
     }
-  }
-
-  BoxBorder? getBorder() {
-    if (!widget.attempted) {
-      return Border.all(
-        // Use theme colors for border
-        color: Theme.of(context).colorScheme.onBackground.withOpacity(0.3),
-        width: 2
-      );
-    }
-    return Border.all(color: Colors.transparent, width: 2);
-  }
-
-  Color getTextColor() {
-    if (!widget.attempted) {
-      // Use theme colors for text
-      return Theme.of(context).colorScheme.onSurface;
-    }
-    return Colors.white; // Keep white for attempted letters as they'll be on colored backgrounds
-  }
-
-  Color getBackgroundColor() {
-    if (widget.color != null) {
-      return widget.color!;
-    }
-    // Use theme surface color for empty cells
-    return Theme.of(context).colorScheme.surface;
   }
 
   @override
@@ -113,8 +82,16 @@ class _WordleGridElementState extends State<WordleGridElement>
             padding: const EdgeInsets.all(10),
             margin: const EdgeInsets.all(2),
             decoration: BoxDecoration(
-              border: getBorder(),
-              color: getBackgroundColor(),
+              border: widget.attempted
+                  ? Border.all(color: Colors.transparent, width: 2)
+                  : Border.all(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(
+                          widget.letter.isEmpty
+                              ? 0.3
+                              : 0.58 
+                          ),
+                      width: 2),
+              color: widget.color ?? Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.all(Radius.circular(4)),
             ),
             child: Text(
@@ -122,7 +99,9 @@ class _WordleGridElementState extends State<WordleGridElement>
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: getTextColor(),
+                color: widget.attempted
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),

@@ -126,7 +126,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
           gameOver: true,
         );
 
-        ConfettiOverlay.show(context);
+        // ConfettiOverlay.show(context);
         HapticFeedback.heavyImpact();
         CustomToast.show(
           context,

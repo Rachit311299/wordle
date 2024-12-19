@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
 import 'package:wordle/providers/theme_provider.dart';
-import 'package:flutter/services.dart';
+
 
 class WordleTitleBar extends StatelessWidget {
   const WordleTitleBar({super.key});
@@ -56,8 +56,7 @@ class ThemeToggleButton extends ConsumerWidget {
           ),
           padding: EdgeInsets.zero,
         ),
-        onPressed: ()async {
-          await HapticFeedback.lightImpact();
+        onPressed: () {
           ref.read(themeProvider.notifier).toggleTheme();
         },
         child: Icon(
@@ -105,10 +104,7 @@ class WordSizeToggle extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onPressed:()async{
-          await HapticFeedback.lightImpact();
-          _updateWordSize();
-        },
+        onPressed: _updateWordSize,
       ),
     );
   }
@@ -164,10 +160,7 @@ class WordAttemptToggle extends ConsumerWidget {
             fontSize: 13,
           ),
         ),
-        onPressed: () async {
-          await HapticFeedback.lightImpact();
-          _updateAttempts();
-        },
+        onPressed: _updateAttempts,
       ),
     );
   }

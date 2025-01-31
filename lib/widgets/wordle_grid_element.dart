@@ -38,7 +38,7 @@ class _WordleGridElementState extends State<WordleGridElement>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Duration(milliseconds: kIsWeb ? 200 : 300), // Faster animation on web
+      duration: Duration(milliseconds: kIsWeb ? 290 : 300), // Faster animation on web
       vsync: this,
     );
 

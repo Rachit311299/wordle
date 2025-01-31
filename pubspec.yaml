@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.0
   lottie: ^3.0.0
+  shared_preferences: ^2.5.1
 
   
 

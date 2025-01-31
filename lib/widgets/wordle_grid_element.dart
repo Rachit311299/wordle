@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 class WordleGridElement extends StatefulWidget {
   final int pos;
@@ -33,25 +32,32 @@ class _WordleGridElementState extends State<WordleGridElement>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
+  bool _isAnimating = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: Duration(milliseconds: kIsWeb ? 200 : 300), // Faster animation on web
       vsync: this,
     );
 
     _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOutCubic,
+        curve: Curves.easeOut, // Simpler curve for web
       ),
     );
 
     if (widget.letter.isNotEmpty) {
-      _controller.forward();
+      _animateWithDebounce();
     }
+  }
+
+  void _animateWithDebounce() {
+    if (_isAnimating) return;
+    _isAnimating = true;
+    _controller.forward().then((_) => _isAnimating = false);
   }
 
   @override
@@ -66,55 +72,69 @@ class _WordleGridElementState extends State<WordleGridElement>
 
     if (widget.letter != oldWidget.letter && widget.letter.isNotEmpty) {
       _controller.reset();
-      _controller.forward();
+      _animateWithDebounce();
     }
 
     if (!oldWidget.attempted && widget.attempted) {
       _controller.reset();
-      Future.delayed(Duration(milliseconds: widget.pos * 200), () {
-        if (mounted) {
-          _controller.forward();
-        }
-      });
+      if (!kIsWeb) {
+        // Only delay on non-web platforms
+        Future.delayed(Duration(milliseconds: widget.pos * 200), () {
+          if (mounted) {
+            _animateWithDebounce();
+          }
+        });
+      } else {
+        // Immediate animation on web with minimal delay
+        Future.delayed(Duration(milliseconds: widget.pos * 50), () {
+          if (mounted) {
+            _animateWithDebounce();
+          }
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: widget.letter.isEmpty ? 1.0 : _scaleAnimation.value,
-          child: Container(
-            width: 50,
-            height: 50,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              border: widget.attempted
-                  ? Border.all(color: Colors.transparent, width: 2)
-                  : Border.all(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(
-                          widget.letter.isEmpty ? 0.3 : 0.58),
-                      width: 2),
-              color: widget.color ?? Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.all(Radius.circular(4)),
-            ),
-            child: Text(
-              widget.letter.toUpperCase(),
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: widget.attempted
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.onSurface,
-              ),
+    // Use RepaintBoundary to isolate animations
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: widget.letter.isEmpty ? 1.0 : _scaleAnimation.value,
+            child: child,
+          );
+        },
+        child: Container(
+          width: 50,
+          height: 50,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            border: widget.attempted
+                ? null // Remove border when attempted to reduce repaints
+                : Border.all(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(
+                        widget.letter.isEmpty ? 0.3 : 0.58),
+                    width: 2),
+            color: widget.color ?? Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.all(Radius.circular(4)),
+          ),
+          child: Text(
+            widget.letter.toUpperCase(),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: widget.attempted
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

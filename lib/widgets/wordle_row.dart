@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/providers/game_state_provider.dart';
 import 'package:wordle/widgets/wordle_grid_element.dart';
 
-class WordleRow extends ConsumerWidget {
+class WordleRow extends ConsumerStatefulWidget {
   final int wordsize;
   final String word;
   final String correctWord;
@@ -20,33 +20,55 @@ class WordleRow extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    List<Color?> colors;
-    
-    if (attempted) {
-      // Use cached colors for submitted rows
-      final gameState = ref.watch(gameStateProvider);
-      colors = gameState.submittedColors[rowIndex];
+  ConsumerState<WordleRow> createState() => _WordleRowState();
+}
+
+class _WordleRowState extends ConsumerState<WordleRow> {
+  late List<Color?> colors;
+  late List<Widget> boxes;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeRow();
+  }
+
+  @override
+  void didUpdateWidget(WordleRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.attempted != oldWidget.attempted || 
+        widget.word != oldWidget.word) {
+      _initializeRow();
+    }
+  }
+
+  void _initializeRow() {
+    if (widget.attempted) {
+      final gameState = ref.read(gameStateProvider);
+      colors = gameState.submittedColors[widget.rowIndex];
     } else {
-      // For current row, use null colors
-      colors = List.filled(wordsize, null);
+      colors = List.filled(widget.wordsize, null);
     }
 
-    final List<Widget> boxes = List.generate(wordsize, (j) {
-      final letter = (word.length > j) ? word[j] : "";
-      // Use ValueKey to help Flutter identify which elements can be reused
+    boxes = List.generate(widget.wordsize, (j) {
+      final letter = (widget.word.length > j) ? widget.word[j] : "";
       return WordleGridElement(
-        key: ValueKey('${rowIndex}_$j'),
+        key: ValueKey('${widget.rowIndex}_$j'),
         pos: j,
         letter: letter,
-        attempted: attempted,
+        attempted: widget.attempted,
         color: colors[j],
       );
     });
+  }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: boxes,
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: boxes,
+      ),
     );
   }
 }

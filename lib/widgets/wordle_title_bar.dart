@@ -15,7 +15,7 @@ class WordleTitleBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "wordscape",
+            "wordscapes",
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,

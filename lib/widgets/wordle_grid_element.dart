@@ -17,15 +17,6 @@ class WordleGridElement extends StatefulWidget {
 
   @override
   State<WordleGridElement> createState() => _WordleGridElementState();
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(IntProperty('pos', pos));
-    properties.add(StringProperty('letter', letter));
-    properties.add(DiagnosticsProperty<bool>('attempted', attempted));
-    properties.add(ColorProperty('color', color));
-  }
 }
 
 class _WordleGridElementState extends State<WordleGridElement>
@@ -33,21 +24,29 @@ class _WordleGridElementState extends State<WordleGridElement>
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
   bool _isAnimating = false;
+  late final BorderSide _transparentBorder;
+  late final double _emptyOpacity;
+  late final double _filledOpacity;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Duration(milliseconds: kIsWeb ? 290 : 300), // Faster animation on web
+      duration: Duration(milliseconds: kIsWeb ? 290 : 300),
       vsync: this,
     );
 
     _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOut, // Simpler curve for web
+        curve: Curves.easeOut,
       ),
     );
+
+    // Pre-calculate values
+    _transparentBorder = const BorderSide(color: Colors.transparent, width: 2);
+    _emptyOpacity = 0.3;
+    _filledOpacity = 0.58;
 
     if (widget.letter.isNotEmpty) {
       _animateWithDebounce();
@@ -78,14 +77,12 @@ class _WordleGridElementState extends State<WordleGridElement>
     if (!oldWidget.attempted && widget.attempted) {
       _controller.reset();
       if (!kIsWeb) {
-        // Only delay on non-web platforms
         Future.delayed(Duration(milliseconds: widget.pos * 200), () {
           if (mounted) {
             _animateWithDebounce();
           }
         });
       } else {
-        // Immediate animation on web with minimal delay
         Future.delayed(Duration(milliseconds: widget.pos * 50), () {
           if (mounted) {
             _animateWithDebounce();
@@ -97,7 +94,26 @@ class _WordleGridElementState extends State<WordleGridElement>
 
   @override
   Widget build(BuildContext context) {
-    // Use RepaintBoundary to isolate animations
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    
+    // Pre-calculate the border
+    final border = widget.attempted
+        ? _transparentBorder
+        : BorderSide(
+            color: onSurface.withOpacity(
+              widget.letter.isEmpty ? _emptyOpacity : _filledOpacity,
+            ),
+            width: 2,
+          );
+
+    // Pre-calculate the container decoration
+    final decoration = BoxDecoration(
+      border: Border.fromBorderSide(border),
+      color: widget.color ?? theme.colorScheme.surface,
+      borderRadius: const BorderRadius.all(Radius.circular(4)),
+    );
+
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _controller,
@@ -113,24 +129,13 @@ class _WordleGridElementState extends State<WordleGridElement>
           alignment: Alignment.center,
           padding: const EdgeInsets.all(10),
           margin: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            border: widget.attempted
-                ? null // Remove border when attempted to reduce repaints
-                : Border.all(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(
-                        widget.letter.isEmpty ? 0.3 : 0.58),
-                    width: 2),
-            color: widget.color ?? Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.all(Radius.circular(4)),
-          ),
+          decoration: decoration,
           child: Text(
             widget.letter.toUpperCase(),
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: widget.attempted
-                  ? Colors.white
-                  : Theme.of(context).colorScheme.onSurface,
+              color: widget.attempted ? Colors.white : onSurface,
             ),
           ),
         ),

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wordle/providers/game_state_provider.dart';
 import 'package:wordle/widgets/wordle_grid_element.dart';
 
-class WordleRow extends StatelessWidget {
+class WordleRow extends ConsumerWidget {
   final int wordsize;
   final String word;
   final String correctWord;
   final bool attempted;
+  final int rowIndex;
 
   const WordleRow({
     super.key,
@@ -13,15 +16,27 @@ class WordleRow extends StatelessWidget {
     required this.word,
     required this.attempted,
     required this.correctWord,
+    required this.rowIndex,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final List<Color?> colors = attempted ? _getColorsForRow(context) : List.filled(wordsize, null);
+  Widget build(BuildContext context, WidgetRef ref) {
+    List<Color?> colors;
+    
+    if (attempted) {
+      // Use cached colors for submitted rows
+      final gameState = ref.watch(gameStateProvider);
+      colors = gameState.submittedColors[rowIndex];
+    } else {
+      // For current row, use null colors
+      colors = List.filled(wordsize, null);
+    }
 
-    final List<WordleGridElement> boxes = List.generate(wordsize, (j) {
+    final List<Widget> boxes = List.generate(wordsize, (j) {
       final letter = (word.length > j) ? word[j] : "";
+      // Use ValueKey to help Flutter identify which elements can be reused
       return WordleGridElement(
+        key: ValueKey('${rowIndex}_$j'),
         pos: j,
         letter: letter,
         attempted: attempted,
@@ -33,44 +48,5 @@ class WordleRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: boxes,
     );
-  }
-
-  List<Color?> _getColorsForRow(BuildContext context) {
-    // Initialize with theme-aware grey color
-    final Color defaultGrey = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey[900]! // Darker grey for dark mode
-        : const Color.fromARGB(255, 100, 100, 100); // Original grey for light mode
-
-    final List<Color?> colors = List.filled(wordsize, defaultGrey);
-    final Map<String, int> remainingCounts = {};
-
-    // Count occurrences of each letter in the correct word
-    for (var char in correctWord.split('')) {
-      remainingCounts[char] = (remainingCounts[char] ?? 0) + 1;
-    }
-
-    // Define semantic colors that work well in both themes
-    final correctColor = Colors.green[600]!; // Slightly darker green for better contrast
-    final misplacedColor = Colors.orange[400]!; // Adjusted orange for better visibility
-
-    // Mark green matches and reduce counts
-    for (int i = 0; i < word.length; i++) {
-      if (word[i] == correctWord[i]) {
-        colors[i] = correctColor;
-        remainingCounts[word[i]] = remainingCounts[word[i]]! - 1;
-      }
-    }
-
-    // Mark orange matches for misplaced letters
-    for (int i = 0; i < word.length; i++) {
-      if (colors[i] == defaultGrey && 
-          remainingCounts.containsKey(word[i]) &&
-          remainingCounts[word[i]]! > 0) {
-        colors[i] = misplacedColor;
-        remainingCounts[word[i]] = remainingCounts[word[i]]! - 1;
-      }
-    }
-
-    return colors;
   }
 }

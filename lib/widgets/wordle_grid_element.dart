@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class WordleGridElement extends StatefulWidget {
   final int pos;
@@ -16,6 +18,15 @@ class WordleGridElement extends StatefulWidget {
 
   @override
   State<WordleGridElement> createState() => _WordleGridElementState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IntProperty('pos', pos));
+    properties.add(StringProperty('letter', letter));
+    properties.add(DiagnosticsProperty<bool>('attempted', attempted));
+    properties.add(ColorProperty('color', color));
+  }
 }
 
 class _WordleGridElementState extends State<WordleGridElement>
@@ -86,10 +97,7 @@ class _WordleGridElementState extends State<WordleGridElement>
                   ? Border.all(color: Colors.transparent, width: 2)
                   : Border.all(
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(
-                          widget.letter.isEmpty
-                              ? 0.3
-                              : 0.58 
-                          ),
+                          widget.letter.isEmpty ? 0.3 : 0.58),
                       width: 2),
               color: widget.color ?? Theme.of(context).colorScheme.surface,
               borderRadius: const BorderRadius.all(Radius.circular(4)),

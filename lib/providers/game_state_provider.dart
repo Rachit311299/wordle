@@ -15,8 +15,9 @@ class GameState {
   final String correctWord;
   final List<String> attempts;
   final int attempted;
-  final bool gameOver; // Tracks if the game has ended
-  final Map<String, String> keyStates; // Tracks keyboard letter states
+  final bool gameOver;
+  final Map<String, String> keyStates;
+  final List<List<Color>> submittedColors;
 
   const GameState({
     required this.wordBank,
@@ -27,6 +28,7 @@ class GameState {
     required this.attempted,
     this.gameOver = false,
     this.keyStates = const {},
+    this.submittedColors = const [],
   });
 
   GameState clone({
@@ -37,6 +39,7 @@ class GameState {
     List<String>? wordBank,
     bool? gameOver,
     Map<String, String>? keyStates,
+    List<List<Color>>? submittedColors,
   }) {
     return GameState(
       wordBank: wordBank ?? this.wordBank,
@@ -47,6 +50,7 @@ class GameState {
       attempted: attempted ?? this.attempted,
       gameOver: gameOver ?? this.gameOver,
       keyStates: keyStates ?? this.keyStates,
+      submittedColors: submittedColors ?? this.submittedColors,
     );
   }
 }
@@ -83,6 +87,47 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
+  List<Color> _calculateRowColors(String word, String correctWord, BuildContext context) {
+    final int wordsize = state.settings.wordsize;
+    
+    // Initialize with theme-aware grey color
+    final Color defaultGrey = Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[900]! // Darker grey for dark mode
+        : const Color.fromARGB(255, 100, 100, 100); // Original grey for light mode
+
+    final List<Color> colors = List.filled(wordsize, defaultGrey);
+    final Map<String, int> remainingCounts = {};
+
+    // Count occurrences of each letter in the correct word
+    for (var char in correctWord.split('')) {
+      remainingCounts[char] = (remainingCounts[char] ?? 0) + 1;
+    }
+
+    // Define semantic colors that work well in both themes
+    final correctColor = Colors.green[600]!;
+    final misplacedColor = Colors.orange[400]!;
+
+    // Mark green matches and reduce counts
+    for (int i = 0; i < word.length; i++) {
+      if (word[i] == correctWord[i]) {
+        colors[i] = correctColor;
+        remainingCounts[word[i]] = remainingCounts[word[i]]! - 1;
+      }
+    }
+
+    // Mark orange matches for misplaced letters
+    for (int i = 0; i < word.length; i++) {
+      if (colors[i] == defaultGrey && 
+          remainingCounts.containsKey(word[i]) &&
+          remainingCounts[word[i]]! > 0) {
+        colors[i] = misplacedColor;
+        remainingCounts[word[i]] = remainingCounts[word[i]]! - 1;
+      }
+    }
+
+    return colors;
+  }
+
   Future<void> updateCurrentAttempt(BuildContext context, String key) async {
     if (state.gameOver) return;
 
@@ -113,12 +158,16 @@ class GameStateNotifier extends StateNotifier<GameState> {
         return;
       }
 
-      // Update key states after the word is submitted
-      _updateKeyStates(currentAttempt);
+      // Calculate colors for the submitted row
+      final colors = _calculateRowColors(currentAttempt, state.correctWord, context);
+      final List<List<Color>> newSubmittedColors = List.from(state.submittedColors)..add(colors);
 
       state = state.clone(
         attempted: state.attempted + 1,
+        submittedColors: newSubmittedColors,
       );
+
+      _updateKeyStates(currentAttempt);
 
       if (currentAttempt == state.correctWord) {
         // Win condition

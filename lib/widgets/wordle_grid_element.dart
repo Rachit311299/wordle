@@ -24,9 +24,6 @@ class _WordleGridElementState extends State<WordleGridElement>
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
   bool _isAnimating = false;
-  late final BorderSide _transparentBorder;
-  late final double _emptyOpacity;
-  late final double _filledOpacity;
 
   @override
   void initState() {
@@ -42,11 +39,6 @@ class _WordleGridElementState extends State<WordleGridElement>
         curve: Curves.easeOut,
       ),
     );
-
-    // Pre-calculate values
-    _transparentBorder = const BorderSide(color: Colors.transparent, width: 2);
-    _emptyOpacity = 0.3;
-    _filledOpacity = 0.58;
 
     if (widget.letter.isNotEmpty) {
       _animateWithDebounce();
@@ -94,50 +86,64 @@ class _WordleGridElementState extends State<WordleGridElement>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
-    
-    // Pre-calculate the border
-    final border = widget.attempted
-        ? _transparentBorder
-        : BorderSide(
-            color: onSurface.withOpacity(
-              widget.letter.isEmpty ? _emptyOpacity : _filledOpacity,
-            ),
-            width: 2,
-          );
-
-    // Pre-calculate the container decoration
-    final decoration = BoxDecoration(
-      border: Border.fromBorderSide(border),
-      color: widget.color ?? theme.colorScheme.surface,
-      borderRadius: const BorderRadius.all(Radius.circular(4)),
-    );
-
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
           return Transform.scale(
             scale: widget.letter.isEmpty ? 1.0 : _scaleAnimation.value,
-            child: child,
+            child: _GridTile(
+              letter: widget.letter,
+              attempted: widget.attempted,
+              color: widget.color,
+            ),
           );
         },
-        child: Container(
-          width: 50,
-          height: 50,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(10),
-          margin: const EdgeInsets.all(2),
-          decoration: decoration,
-          child: Text(
-            widget.letter.toUpperCase(),
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: widget.attempted ? Colors.white : onSurface,
-            ),
-          ),
+      ),
+    );
+  }
+}
+
+class _GridTile extends StatelessWidget {
+  final String letter;
+  final bool attempted;
+  final Color? color;
+
+  const _GridTile({
+    required this.letter,
+    required this.attempted,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    return Container(
+      width: 50,
+      height: 50,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        border: Border.fromBorderSide(
+          attempted
+              ? const BorderSide(color: Colors.transparent, width: 2)
+              : BorderSide(
+                  color: onSurface.withOpacity(letter.isEmpty ? 0.3 : 0.58),
+                  width: 2,
+                ),
+        ),
+        color: color ?? theme.colorScheme.surface,
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+      ),
+      child: Text(
+        letter.toUpperCase(),
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: attempted ? Colors.white : onSurface,
         ),
       ),
     );

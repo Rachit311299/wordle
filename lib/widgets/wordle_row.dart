@@ -26,6 +26,7 @@ class WordleRow extends ConsumerStatefulWidget {
 class _WordleRowState extends ConsumerState<WordleRow> {
   late List<Color?> colors;
   late List<Widget> boxes;
+  Brightness? _lastBrightness; // Track the last known brightness
 
   @override
   void initState() {
@@ -34,9 +35,25 @@ class _WordleRowState extends ConsumerState<WordleRow> {
   }
 
   @override
-  void didUpdateWidget(WordleRow oldWidget) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentBrightness = Theme.of(context).brightness;
+    // Initialize _lastBrightness if it’s null
+    if (_lastBrightness == null) {
+      _lastBrightness = currentBrightness;
+    } else if (_lastBrightness != currentBrightness) {
+      // Theme (brightness) has changed!
+      _lastBrightness = currentBrightness;
+      setState(() {
+        _initializeRow();
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant WordleRow oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.attempted != oldWidget.attempted || 
+    if (widget.attempted != oldWidget.attempted ||
         widget.word != oldWidget.word ||
         widget.correctWord != oldWidget.correctWord) {
       _initializeRow();
@@ -45,8 +62,12 @@ class _WordleRowState extends ConsumerState<WordleRow> {
 
   void _initializeRow() {
     if (widget.attempted) {
-      final gameState = ref.read(gameStateProvider);
-      colors = gameState.submittedColors[widget.rowIndex];
+      // Instead of using the stored submittedColors directly,
+      // recalc them using your theme-aware calculation function.
+      // (If you don’t want to change gameStateProvider, you can call its method here.)
+      colors = ref
+          .read(gameStateProvider.notifier)
+          .calculateRowColors(widget.word, widget.correctWord, context);
     } else {
       colors = List.filled(widget.wordsize, null);
     }

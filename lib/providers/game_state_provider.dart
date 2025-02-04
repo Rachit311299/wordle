@@ -87,7 +87,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  List<Color> _calculateRowColors(String word, String correctWord, BuildContext context) {
+  List<Color> calculateRowColors(String word, String correctWord, BuildContext context) {
     final int wordsize = state.settings.wordsize;
     
     // Initialize with theme-aware grey color
@@ -159,7 +159,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       }
 
       // Calculate colors for the submitted row
-      final colors = _calculateRowColors(currentAttempt, state.correctWord, context);
+      final colors = calculateRowColors(currentAttempt, state.correctWord, context);
       final List<List<Color>> newSubmittedColors = List.from(state.submittedColors)..add(colors);
 
       // Update state in a single clone to ensure atomic update

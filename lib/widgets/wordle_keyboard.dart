@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wordle/widgets/wordle_key_element.dart';
 import 'package:wordle/providers/game_state_provider.dart';
+import 'package:wordle/widgets/wordle_key_element.dart';
 
 class WordleKeyboard extends ConsumerStatefulWidget {
-  const WordleKeyboard({super.key});
+  const WordleKeyboard({Key? key}) : super(key: key);
 
   @override
   ConsumerState<WordleKeyboard> createState() => _WordleKeyboardState();
@@ -18,7 +18,6 @@ class _WordleKeyboardState extends ConsumerState<WordleKeyboard> {
   void initState() {
     super.initState();
     _focusNode = FocusNode();
-    // Request focus when the widget is first built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode?.requestFocus();
     });
@@ -33,17 +32,14 @@ class _WordleKeyboardState extends ConsumerState<WordleKeyboard> {
   void _handleKeyEvent(RawKeyEvent event) {
     if (event is RawKeyDownEvent) {
       final key = event.logicalKey;
-      
-      // Handle letter keys
       if (key.keyLabel.length == 1 && RegExp(r'[a-zA-Z]').hasMatch(key.keyLabel)) {
-        ref.read(gameStateProvider.notifier).updateCurrentAttempt(context, key.keyLabel.toLowerCase());
-      }
-      // Handle enter key (maps to '_' in our virtual keyboard)
-      else if (key == LogicalKeyboardKey.enter) {
+        ref
+            .read(gameStateProvider.notifier)
+            .updateCurrentAttempt(context, key.keyLabel.toLowerCase());
+      } else if (key == LogicalKeyboardKey.enter) {
         ref.read(gameStateProvider.notifier).updateCurrentAttempt(context, '_');
-      }
-      // Handle backspace key (maps to '+' in our virtual keyboard)
-      else if (key == LogicalKeyboardKey.backspace || key == LogicalKeyboardKey.delete) {
+      } else if (key == LogicalKeyboardKey.backspace ||
+          key == LogicalKeyboardKey.delete) {
         ref.read(gameStateProvider.notifier).updateCurrentAttempt(context, '+');
       }
     }
@@ -51,9 +47,6 @@ class _WordleKeyboardState extends ConsumerState<WordleKeyboard> {
 
   @override
   Widget build(BuildContext context) {
-    // Fetch the key states from the GameStateProvider
-    final letterStates = ref.watch(gameStateProvider).keyStates;
-
     return Focus(
       focusNode: _focusNode,
       autofocus: true,
@@ -67,31 +60,22 @@ class _WordleKeyboardState extends ConsumerState<WordleKeyboard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (var i in "qwertyuiop".split(""))
-                WordleKeyElement(
-                  letter: i,
-                  state: letterStates[i] ?? 'default', 
-                ),
+              for (var letter in "qwertyuiop".split(""))
+                WordleKeyElement(letter: letter),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (var i in "asdfghjkl".split(""))
-                WordleKeyElement(
-                  letter: i,
-                  state: letterStates[i] ?? 'default', 
-                ),
+              for (var letter in "asdfghjkl".split(""))
+                WordleKeyElement(letter: letter),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (var i in "_zxcvbnm+".split(""))
-                WordleKeyElement(
-                  letter: i,
-                  state: letterStates[i] ?? 'default', 
-                ),
+              for (var letter in "_zxcvbnm+".split(""))
+                WordleKeyElement(letter: letter),
             ],
           ),
         ],

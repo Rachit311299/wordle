@@ -37,7 +37,8 @@ class _WordleRowState extends ConsumerState<WordleRow> {
   void didUpdateWidget(WordleRow oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.attempted != oldWidget.attempted || 
-        widget.word != oldWidget.word) {
+        widget.word != oldWidget.word ||
+        widget.correctWord != oldWidget.correctWord) {
       _initializeRow();
     }
   }
@@ -53,7 +54,7 @@ class _WordleRowState extends ConsumerState<WordleRow> {
     boxes = List.generate(widget.wordsize, (j) {
       final letter = (widget.word.length > j) ? widget.word[j] : "";
       return WordleGridElement(
-        key: ValueKey('${widget.rowIndex}_$j'),
+        key: ValueKey('${widget.rowIndex}_${j}_${widget.attempted}'),
         pos: j,
         letter: letter,
         attempted: widget.attempted,

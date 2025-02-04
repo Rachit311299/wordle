@@ -162,9 +162,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
       final colors = _calculateRowColors(currentAttempt, state.correctWord, context);
       final List<List<Color>> newSubmittedColors = List.from(state.submittedColors)..add(colors);
 
+      // Update state in a single clone to ensure atomic update
       state = state.clone(
         attempted: state.attempted + 1,
         submittedColors: newSubmittedColors,
+        attempts: List.from(attempts), // Ensure attempts list is properly cloned
       );
 
       _updateKeyStates(currentAttempt);

@@ -10,11 +10,13 @@ class AppTheme {
   static final _darkSurfaceColor = Colors.grey[850]!;
   static final _darkBackgroundColor = Colors.grey[900]!;
 
+  static final gameColors = _GameColors();
+
   static ThemeData _buildLightTheme() {
     const textTheme = TextTheme(
       bodyLarge: TextStyle(color: Color(0xFF333333)),
       bodyMedium: TextStyle(color: Color(0xFF333333)),
-    );
+    );  
 
     return ThemeData(
       useMaterial3: true,
@@ -60,4 +62,45 @@ class AppTheme {
       textTheme: textTheme,
     );
   }
+  
+}
+
+class _GameColors {
+  // Grid element colors
+  final Color lightDefaultGrey = const Color.fromARGB(255, 100, 100, 100);
+  final Color darkDefaultGrey = Colors.grey[900]!;
+  
+  // Key colors
+  final Color lightKeyDefault = const Color.fromARGB(44, 73, 73, 73);
+  final Color darkKeyDefault = Colors.grey[800]!;
+  final Color lightKeyUsed = Colors.grey[700]!;
+  final Color darkKeyUsed = Colors.grey[900]!;
+  
+  // Text colors
+  final Color lightTextColor = Colors.black;
+  final Color darkTextColor = Colors.white;
+  
+  // Icon colors
+  final Color lightIconColor = Colors.black87;
+  final Color darkIconColor = Colors.white70;
+  
+  // Game colors (theme independent)
+  final Color correctColor = Colors.green[600]!;
+  final Color misplacedColor = Colors.orange[400]!;
+  
+  // Get the appropriate color based on brightness
+  Color getDefaultGrey(Brightness brightness) => 
+      brightness == Brightness.dark ? darkDefaultGrey : lightDefaultGrey;
+  
+  Color getKeyDefault(Brightness brightness) => 
+      brightness == Brightness.dark ? darkKeyDefault : lightKeyDefault;
+  
+  Color getKeyUsed(Brightness brightness) => 
+      brightness == Brightness.dark ? darkKeyUsed : lightKeyUsed;
+      
+  Color getTextColor(Brightness brightness) => 
+      brightness == Brightness.dark ? darkTextColor : lightTextColor;
+      
+  Color getIconColor(Brightness brightness) => 
+      brightness == Brightness.dark ? darkIconColor : lightIconColor;
 }

@@ -62,9 +62,7 @@ class _WordleRowState extends ConsumerState<WordleRow> {
 
   void _initializeRow() {
     if (widget.attempted) {
-      // Instead of using the stored submittedColors directly,
-      // recalc them using your theme-aware calculation function.
-      // (If you don’t want to change gameStateProvider, you can call its method here.)
+
       colors = ref
           .read(gameStateProvider.notifier)
           .calculateRowColors(widget.word, widget.correctWord, context);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/data/wordle_repo.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
+import 'package:wordle/theme/theme_data.dart';
 import 'package:wordle/widgets/confetti_overlay.dart';
 import 'package:wordle/widgets/correctword_overlay.dart';
 import 'package:wordle/widgets/custom_toast.dart';
@@ -87,13 +88,13 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  List<Color> calculateRowColors(String word, String correctWord, BuildContext context) {
+  List<Color> calculateRowColors(
+      String word, String correctWord, BuildContext context) {
     final int wordsize = state.settings.wordsize;
-    
+
     // Initialize with theme-aware grey color
-    final Color defaultGrey = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey[900]! // Darker grey for dark mode
-        : const Color.fromARGB(255, 100, 100, 100); // Original grey for light mode
+    final Color defaultGrey =
+        AppTheme.gameColors.getDefaultGrey(Theme.of(context).brightness);
 
     final List<Color> colors = List.filled(wordsize, defaultGrey);
     final Map<String, int> remainingCounts = {};
@@ -104,8 +105,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
     }
 
     // Define semantic colors that work well in both themes
-    final correctColor = Colors.green[600]!;
-    final misplacedColor = Colors.orange[400]!;
+    final correctColor = AppTheme.gameColors.correctColor;
+    final misplacedColor = AppTheme.gameColors.misplacedColor;
 
     // Mark green matches and reduce counts
     for (int i = 0; i < word.length; i++) {
@@ -117,7 +118,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
     // Mark orange matches for misplaced letters
     for (int i = 0; i < word.length; i++) {
-      if (colors[i] == defaultGrey && 
+      if (colors[i] == defaultGrey &&
           remainingCounts.containsKey(word[i]) &&
           remainingCounts[word[i]]! > 0) {
         colors[i] = misplacedColor;
@@ -146,29 +147,29 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
       if (!state.wordBank.contains(currentAttempt)) {
         print("Enter Valid Word");
-        CustomToast.show(
-          context,
-          "Not a valid word",
-          backgroundColor: const Color.fromARGB(255, 110, 110, 110),
-          shake: true,
-          duration: Duration(seconds: 1)
-        );
+        CustomToast.show(context, "Not a valid word",
+            backgroundColor: const Color.fromARGB(255, 110, 110, 110),
+            shake: true,
+            duration: Duration(seconds: 1));
 
         // HapticFeedback.vibrate();
         HapticFeedback.heavyImpact();
-       
+
         return;
       }
 
       // Calculate colors for the submitted row
-      final colors = calculateRowColors(currentAttempt, state.correctWord, context);
-      final List<List<Color>> newSubmittedColors = List.from(state.submittedColors)..add(colors);
+      final colors =
+          calculateRowColors(currentAttempt, state.correctWord, context);
+      final List<List<Color>> newSubmittedColors =
+          List.from(state.submittedColors)..add(colors);
 
       // Update state in a single clone to ensure atomic update
       state = state.clone(
         attempted: state.attempted + 1,
         submittedColors: newSubmittedColors,
-        attempts: List.from(attempts), // Ensure attempts list is properly cloned
+        attempts:
+            List.from(attempts), // Ensure attempts list is properly cloned
       );
 
       _updateKeyStates(currentAttempt);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/providers/game_state_provider.dart';
+import 'package:wordle/theme/theme_data.dart';
 
 class WordleKeyElement extends ConsumerStatefulWidget {
   final String letter;
@@ -30,17 +31,13 @@ class _WordleKeyElementState extends ConsumerState<WordleKeyElement> {
     Color getBgColor() {
       switch (letterState) {
         case 'green':
-          return Colors.green;
+          return AppTheme.gameColors.correctColor;
         case 'orange':
-          return Colors.orangeAccent;
+          return AppTheme.gameColors.misplacedColor;
         case 'grey':
-          return Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[900]!
-              : Colors.grey[700]!;
+          return AppTheme.gameColors.getKeyUsed(Theme.of(context).brightness);
         default:
-          return Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[800]!
-              : const Color.fromARGB(44, 73, 73, 73);
+          return AppTheme.gameColors.getKeyDefault(Theme.of(context).brightness);
       }
     }
 
@@ -52,9 +49,7 @@ class _WordleKeyElementState extends ConsumerState<WordleKeyElement> {
     }
 
     Color getIconColor() {
-      return Theme.of(context).brightness == Brightness.dark
-          ? Colors.white70
-          : Colors.black87;
+      return AppTheme.gameColors.getIconColor(Theme.of(context).brightness);
     }
 
     // Determine what to show on the key based on the letter

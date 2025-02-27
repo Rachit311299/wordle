@@ -17,7 +17,7 @@ class WordleTitleBar extends StatelessWidget {
           Text(
             "wordscape",
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 26,
               fontFamily: "Cocogoose",
               fontStyle: FontStyle.italic,
               color: Theme.of(context).colorScheme.onSurface,

@@ -17,8 +17,9 @@ class WordleTitleBar extends StatelessWidget {
           Text(
             "wordscape",
             style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
+              fontSize: 28,
+              fontFamily: "Cocogoose",
+              fontStyle: FontStyle.italic,
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
@@ -98,6 +99,7 @@ class WordSizeToggle extends ConsumerWidget {
           ),
           padding: EdgeInsets.zero,
         ),
+        onPressed: _updateWordSize,
         child: Text(
           gameSettings.wordsize.toString(),
           style: TextStyle(
@@ -105,7 +107,6 @@ class WordSizeToggle extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onPressed: _updateWordSize,
       ),
     );
   }
@@ -153,6 +154,7 @@ class WordAttemptToggle extends ConsumerWidget {
           ),
           padding: EdgeInsets.zero,
         ),
+        onPressed: _updateAttempts,
         child: Text(
           difftext,
           style: TextStyle(
@@ -161,7 +163,6 @@ class WordAttemptToggle extends ConsumerWidget {
             fontSize: 13,
           ),
         ),
-        onPressed: _updateAttempts,
       ),
     );
   }

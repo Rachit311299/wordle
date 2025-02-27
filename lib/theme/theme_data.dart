@@ -12,8 +12,8 @@ class AppTheme {
 
   static ThemeData _buildLightTheme() {
     const textTheme = TextTheme(
-      bodyLarge: TextStyle(color: Colors.black),
-      bodyMedium: TextStyle(color: Colors.black),
+      bodyLarge: TextStyle(color: Color(0xFF333333)),
+      bodyMedium: TextStyle(color: Color(0xFF333333)),
     );
 
     return ThemeData(
@@ -25,7 +25,7 @@ class AppTheme {
         primary: Colors.blue,
         secondary: Colors.blueAccent,
         surface: _lightSurfaceColor,
-        onSurface: Colors.black,
+        onSurface: const Color.fromARGB(255, 10, 10, 10),
         surfaceVariant: _lightSurfaceColor,
         onSurfaceVariant: Colors.black87,
         outline: Colors.black26,

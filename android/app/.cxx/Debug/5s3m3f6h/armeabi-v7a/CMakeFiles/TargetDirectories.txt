@@ -1,0 +1,2 @@
+C:/Users/rachi/Desktop/Native/wordle/android/app/.cxx/Debug/5s3m3f6h/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/rachi/Desktop/Native/wordle/android/app/.cxx/Debug/5s3m3f6h/armeabi-v7a/CMakeFiles/rebuild_cache.dir

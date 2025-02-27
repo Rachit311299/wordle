@@ -150,6 +150,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
           context,
           "Not a valid word",
           backgroundColor: const Color.fromARGB(255, 110, 110, 110),
+          shake: true,
+          duration: Duration(seconds: 1)
         );
 
         // HapticFeedback.vibrate();
@@ -200,6 +202,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
           context,
           "Game Over",
           backgroundColor: Colors.red,
+          shake: true,
         );
         HapticFeedback.heavyImpact();
         return;

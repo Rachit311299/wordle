@@ -27,6 +27,7 @@ class _WordleGridElementState extends State<WordleGridElement>
   late final BorderSide _transparentBorder;
   late final double _emptyOpacity;
   late final double _filledOpacity;
+  String _previousLetter = '';
 
   @override
   void initState() {
@@ -47,6 +48,8 @@ class _WordleGridElementState extends State<WordleGridElement>
     _transparentBorder = const BorderSide(color: Colors.transparent, width: 2);
     _emptyOpacity = 0.3;
     _filledOpacity = 0.58;
+    
+    _previousLetter = widget.letter;
 
     if (widget.letter.isNotEmpty) {
       _animateWithDebounce();
@@ -54,9 +57,18 @@ class _WordleGridElementState extends State<WordleGridElement>
   }
 
   void _animateWithDebounce() {
-    if (_isAnimating) return;
+    if (_isAnimating) {
+      _controller.value = 1.0;
+    }
+    
     _isAnimating = true;
-    _controller.forward().then((_) => _isAnimating = false);
+    _controller.forward(from: 0.0).then((_) {
+      if (mounted) {
+        setState(() {
+          _isAnimating = false;
+        });
+      }
+    });
   }
 
   @override
@@ -69,9 +81,16 @@ class _WordleGridElementState extends State<WordleGridElement>
   void didUpdateWidget(WordleGridElement oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.letter != oldWidget.letter && widget.letter.isNotEmpty) {
-      _controller.reset();
-      _animateWithDebounce();
+    _previousLetter = widget.letter;
+
+    if (widget.letter != oldWidget.letter) {
+      if (widget.letter.isNotEmpty) {
+        _controller.stop();
+        _animateWithDebounce();
+      } else {
+        _controller.value = 0.0;
+        _isAnimating = false;
+      }
     }
 
     if (!oldWidget.attempted && widget.attempted) {
@@ -97,7 +116,6 @@ class _WordleGridElementState extends State<WordleGridElement>
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
     
-    // Pre-calculate the border
     final border = widget.attempted
         ? _transparentBorder
         : BorderSide(
@@ -107,12 +125,15 @@ class _WordleGridElementState extends State<WordleGridElement>
             width: 2,
           );
 
-    // Pre-calculate the container decoration
     final decoration = BoxDecoration(
       border: Border.fromBorderSide(border),
       color: widget.color ?? theme.colorScheme.surface,
       borderRadius: const BorderRadius.all(Radius.circular(4)),
     );
+    
+    final displayLetter = widget.letter.isEmpty && _previousLetter.isNotEmpty && _isAnimating
+        ? _previousLetter  // Keep showing previous letter during transition
+        : widget.letter;
 
     return RepaintBoundary(
       child: AnimatedBuilder(
@@ -131,7 +152,7 @@ class _WordleGridElementState extends State<WordleGridElement>
           margin: const EdgeInsets.all(2),
           decoration: decoration,
           child: Text(
-            widget.letter.toUpperCase(),
+            displayLetter.toUpperCase(),
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,

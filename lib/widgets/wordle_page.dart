@@ -50,7 +50,7 @@ class WordlePage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.9),//change the opacity of the background colors
       body: content,
     );
   }

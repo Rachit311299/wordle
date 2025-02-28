@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/data/wordle_repo.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
 import 'package:wordle/theme/theme_data.dart';
-import 'package:wordle/widgets/confetti_overlay.dart';
 import 'package:wordle/widgets/correctword_overlay.dart';
 import 'package:wordle/widgets/custom_toast.dart';
 import 'package:flutter/services.dart';

@@ -24,16 +24,23 @@ class _WordleGridElementState extends State<WordleGridElement>
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
   bool _isAnimating = false;
-  late final BorderSide _transparentBorder;
-  late final double _emptyOpacity;
-  late final double _filledOpacity;
   String _previousLetter = '';
+  
+  // Static constants for better performance
+  static const BorderSide _transparentBorder = BorderSide(color: Colors.transparent, width: 2);
+  static const double _emptyOpacity = 0.3;
+  static const double _filledOpacity = 0.58;
+  static const BorderRadius _borderRadius = BorderRadius.all(Radius.circular(4));
+  static const Duration _webAnimationDuration = Duration(milliseconds: 290);
+  static const Duration _mobileAnimationDuration = Duration(milliseconds: 300);
+  static const EdgeInsets _containerPadding = EdgeInsets.all(10);
+  static const EdgeInsets _containerMargin = EdgeInsets.all(2);
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Duration(milliseconds: kIsWeb ? 290 : 300),
+      duration: kIsWeb ? _webAnimationDuration : _mobileAnimationDuration,
       vsync: this,
     );
 
@@ -43,11 +50,6 @@ class _WordleGridElementState extends State<WordleGridElement>
         curve: Curves.easeOut,
       ),
     );
-
-    // Pre-calculate values
-    _transparentBorder = const BorderSide(color: Colors.transparent, width: 2);
-    _emptyOpacity = 0.3;
-    _filledOpacity = 0.58;
     
     _previousLetter = widget.letter;
 
@@ -59,6 +61,7 @@ class _WordleGridElementState extends State<WordleGridElement>
   void _animateWithDebounce() {
     if (_isAnimating) {
       _controller.value = 1.0;
+      return;
     }
     
     _isAnimating = true;
@@ -81,9 +84,10 @@ class _WordleGridElementState extends State<WordleGridElement>
   void didUpdateWidget(WordleGridElement oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    _previousLetter = widget.letter;
-
+    // Store previous letter for animation transitions
     if (widget.letter != oldWidget.letter) {
+      _previousLetter = oldWidget.letter;
+      
       if (widget.letter.isNotEmpty) {
         _controller.stop();
         _animateWithDebounce();
@@ -93,21 +97,20 @@ class _WordleGridElementState extends State<WordleGridElement>
       }
     }
 
+    // Handle attempt status change
     if (!oldWidget.attempted && widget.attempted) {
       _controller.reset();
-      if (!kIsWeb) {
-        Future.delayed(Duration(milliseconds: widget.pos * 200), () {
-          if (mounted) {
-            _animateWithDebounce();
-          }
-        });
-      } else {
-        Future.delayed(Duration(milliseconds: widget.pos * 50), () {
-          if (mounted) {
-            _animateWithDebounce();
-          }
-        });
-      }
+      
+      // Different delay for web vs mobile
+      final delay = kIsWeb 
+          ? Duration(milliseconds: widget.pos * 50)
+          : Duration(milliseconds: widget.pos * 200);
+      
+      Future.delayed(delay, () {
+        if (mounted) {
+          _animateWithDebounce();
+        }
+      });
     }
   }
 
@@ -116,7 +119,7 @@ class _WordleGridElementState extends State<WordleGridElement>
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
     
-    final border = widget.attempted
+    final BorderSide border = widget.attempted
         ? _transparentBorder
         : BorderSide(
             color: onSurface.withOpacity(
@@ -128,19 +131,28 @@ class _WordleGridElementState extends State<WordleGridElement>
     final decoration = BoxDecoration(
       border: Border.fromBorderSide(border),
       color: widget.color ?? theme.colorScheme.surface,
-      borderRadius: const BorderRadius.all(Radius.circular(4)),
+      borderRadius: _borderRadius,
     );
     
+    // Show previous letter during animation for a smoother transition
     final displayLetter = widget.letter.isEmpty && _previousLetter.isNotEmpty && _isAnimating
-        ? _previousLetter  // Keep showing previous letter during transition
+        ? _previousLetter
         : widget.letter;
+
+    final textStyle = TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: widget.attempted ? Colors.white : onSurface,
+    );
 
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
+          final scale = widget.letter.isEmpty ? 1.0 : _scaleAnimation.value;
+          
           return Transform.scale(
-            scale: widget.letter.isEmpty ? 1.0 : _scaleAnimation.value,
+            scale: scale,
             child: child,
           );
         },
@@ -148,19 +160,18 @@ class _WordleGridElementState extends State<WordleGridElement>
           width: 50,
           height: 50,
           alignment: Alignment.center,
-          padding: const EdgeInsets.all(10),
-          margin: const EdgeInsets.all(2),
+          padding: _containerPadding,
+          margin: _containerMargin,
           decoration: decoration,
           child: Text(
             displayLetter.toUpperCase(),
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: widget.attempted ? Colors.white : onSurface,
-            ),
+            style: textStyle,
           ),
         ),
       ),
     );
   }
 }
+
+
+

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wordle/theme/theme_data.dart';
 import 'package:wordle/widgets/wordle_grid_element.dart';
 
 class CorrectWordOverlay {
@@ -76,7 +77,7 @@ class CorrectWordOverlay {
                                 pos: index,
                                 letter: correctWord[index],
                                 attempted: true,
-                                color: Colors.green,
+                                color: AppTheme.gameColors.incorrectColor
                               ),
                             ),
                           ),
@@ -98,6 +99,7 @@ class CorrectWordOverlay {
                                 color: theme.brightness == Brightness.dark
                                     ? Colors.white
                                     : Colors.black,
+                                    
                               ),
                             ),
                           ),

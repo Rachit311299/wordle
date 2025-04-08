@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:wordle/theme/theme_data.dart';
 
 class WordleGridElement extends StatefulWidget {
   final int pos;
@@ -25,12 +26,14 @@ class _WordleGridElementState extends State<WordleGridElement>
   late final Animation<double> _scaleAnimation;
   bool _isAnimating = false;
   String _previousLetter = '';
-  
+
   // Static constants for better performance
-  static const BorderSide _transparentBorder = BorderSide(color: Colors.transparent, width: 2);
+  static const BorderSide _transparentBorder =
+      BorderSide(color: Colors.transparent, width: 2);
   static const double _emptyOpacity = 0.3;
   static const double _filledOpacity = 0.58;
-  static const BorderRadius _borderRadius = BorderRadius.all(Radius.circular(4));
+  static const BorderRadius _borderRadius =
+      BorderRadius.all(Radius.circular(4));
   static const Duration _webAnimationDuration = Duration(milliseconds: 290);
   static const Duration _mobileAnimationDuration = Duration(milliseconds: 300);
   static const EdgeInsets _containerPadding = EdgeInsets.all(10);
@@ -50,7 +53,7 @@ class _WordleGridElementState extends State<WordleGridElement>
         curve: Curves.easeOut,
       ),
     );
-    
+
     _previousLetter = widget.letter;
 
     if (widget.letter.isNotEmpty) {
@@ -63,7 +66,7 @@ class _WordleGridElementState extends State<WordleGridElement>
       _controller.value = 1.0;
       return;
     }
-    
+
     _isAnimating = true;
     _controller.forward(from: 0.0).then((_) {
       if (mounted) {
@@ -87,7 +90,7 @@ class _WordleGridElementState extends State<WordleGridElement>
     // Store previous letter for animation transitions
     if (widget.letter != oldWidget.letter) {
       _previousLetter = oldWidget.letter;
-      
+
       if (widget.letter.isNotEmpty) {
         _controller.stop();
         _animateWithDebounce();
@@ -100,12 +103,12 @@ class _WordleGridElementState extends State<WordleGridElement>
     // Handle attempt status change
     if (!oldWidget.attempted && widget.attempted) {
       _controller.reset();
-      
+
       // Different delay for web vs mobile
-      final delay = kIsWeb 
+      final delay = kIsWeb
           ? Duration(milliseconds: widget.pos * 50)
           : Duration(milliseconds: widget.pos * 200);
-      
+
       Future.delayed(delay, () {
         if (mounted) {
           _animateWithDebounce();
@@ -118,7 +121,7 @@ class _WordleGridElementState extends State<WordleGridElement>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    
+
     final BorderSide border = widget.attempted
         ? _transparentBorder
         : BorderSide(
@@ -133,16 +136,19 @@ class _WordleGridElementState extends State<WordleGridElement>
       color: widget.color ?? theme.colorScheme.surface,
       borderRadius: _borderRadius,
     );
-    
+
     // Show previous letter during animation for a smoother transition
-    final displayLetter = widget.letter.isEmpty && _previousLetter.isNotEmpty && _isAnimating
-        ? _previousLetter
-        : widget.letter;
+    final displayLetter =
+        widget.letter.isEmpty && _previousLetter.isNotEmpty && _isAnimating
+            ? _previousLetter
+            : widget.letter;
 
     final textStyle = TextStyle(
       fontSize: 22,
       fontWeight: FontWeight.bold,
-      color: widget.attempted ? Colors.white : onSurface,
+      color: widget.attempted
+          ? Colors.white
+          : AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
     );
 
     return RepaintBoundary(
@@ -150,7 +156,7 @@ class _WordleGridElementState extends State<WordleGridElement>
         animation: _controller,
         builder: (context, child) {
           final scale = widget.letter.isEmpty ? 1.0 : _scaleAnimation.value;
-          
+
           return Transform.scale(
             scale: scale,
             child: child,
@@ -172,6 +178,3 @@ class _WordleGridElementState extends State<WordleGridElement>
     );
   }
 }
-
-
-

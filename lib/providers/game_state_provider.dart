@@ -147,7 +147,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       if (!state.wordBank.contains(currentAttempt)) {
         print("Enter Valid Word");
         CustomToast.show(context, "Not a valid word",
-            backgroundColor: const Color.fromARGB(255, 110, 110, 110),
+            backgroundColor: const Color(0xFF6B5645),
             shake: true,
             duration: Duration(seconds: 1));
 
@@ -184,7 +184,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
         CustomToast.show(
           context,
           "Great! You've solved",
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.gameColors.correctColor,
         );
         return;
       }
@@ -201,7 +201,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
         CustomToast.show(
           context,
           "Game Over",
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.gameColors.incorrectColor,
           shake: true,
         );
         HapticFeedback.heavyImpact();

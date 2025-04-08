@@ -37,13 +37,14 @@ class _WordleKeyElementState extends ConsumerState<WordleKeyElement> {
         case 'grey':
           return AppTheme.gameColors.getKeyUsed(Theme.of(context).brightness);
         default:
-          return AppTheme.gameColors.getKeyDefault(Theme.of(context).brightness);
+          return AppTheme.gameColors
+              .getKeyDefault(Theme.of(context).brightness);
       }
     }
 
     Color getTextColor() {
       if (letterState == 'default') {
-        return Theme.of(context).colorScheme.onSurface;
+        return AppTheme.gameColors.getTextColor(Theme.of(context).brightness);
       }
       return Colors.white;
     }

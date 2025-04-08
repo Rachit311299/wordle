@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
 import 'package:wordle/providers/theme_provider.dart';
+import 'package:wordle/theme/theme_data.dart';
 
 
 class WordleTitleBar extends StatelessWidget {
@@ -20,7 +21,7 @@ class WordleTitleBar extends StatelessWidget {
               fontSize: 26,
               fontFamily: "Cocogoose",
               fontStyle: FontStyle.italic,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: AppTheme.gameColors.getTextColor(Theme.of(context).brightness)
             ),
           ),
           Row(
@@ -51,7 +52,7 @@ class ThemeToggleButton extends ConsumerWidget {
       height: 30,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           side: BorderSide(color: Theme.of(context).colorScheme.outline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -64,7 +65,7 @@ class ThemeToggleButton extends ConsumerWidget {
         child: Icon(
           isDarkMode ? Icons.light_mode : Icons.dark_mode,
           size: 20,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          color: AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
         ),
       ),
     );
@@ -92,7 +93,7 @@ class WordSizeToggle extends ConsumerWidget {
       height: 30,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           side: BorderSide(color: Theme.of(context).colorScheme.outline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -103,7 +104,7 @@ class WordSizeToggle extends ConsumerWidget {
         child: Text(
           gameSettings.wordsize.toString(),
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -147,7 +148,7 @@ class WordAttemptToggle extends ConsumerWidget {
       height: 30,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           side: BorderSide(color: Theme.of(context).colorScheme.outline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -158,7 +159,7 @@ class WordAttemptToggle extends ConsumerWidget {
         child: Text(
           difftext,
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
             fontWeight: FontWeight.bold,
             fontSize: 13,
           ),

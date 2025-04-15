@@ -58,6 +58,24 @@ class GameState {
 class GameStateNotifier extends StateNotifier<GameState> {
   final Random rng = Random();
 
+  Future<void> resetGame() async {
+    final wordData = await loadWords(state.settings.wordsize);
+    final words = wordData["data"]!;
+    final vword = wordData["vdata"]!;
+    final newCorrectWord = words[rng.nextInt(words.length - 1)];
+    state = GameState(
+      settings: state.settings,
+      validWords: words,
+      wordBank: vword,
+      correctWord: newCorrectWord,
+      attempts: List.filled(state.settings.attempts, ""),
+      attempted: 0,
+      gameOver: false,
+      keyStates: {},
+      submittedColors: [],
+    );
+  }
+
   GameStateNotifier(GameSettings settings)
       : super(GameState(
           validWords: [],

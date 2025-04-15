@@ -4,24 +4,32 @@ import 'package:wordle/providers/game_settings_provider.dart';
 import 'package:wordle/providers/theme_provider.dart';
 import 'package:wordle/theme/theme_data.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wordle/providers/game_state_provider.dart';
 
-class WordleTitleBar extends StatelessWidget {
+class WordleTitleBar extends ConsumerWidget {
   const WordleTitleBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            "wordscape",
-            style: TextStyle(
-              fontSize: 26,
-              fontFamily: "Cocogoose",
-              fontStyle: FontStyle.italic,
-              color: AppTheme.gameColors.getTextColor(Theme.of(context).brightness)
+          GestureDetector(
+            onTap: () {
+              // Reset the game with the current word size
+              ref.read(gameStateProvider.notifier).resetGame();
+            },
+            child: Text(
+              "wordscape",
+              style: TextStyle(
+                  fontSize: 26,
+                  fontFamily: "Cocogoose",
+                  fontStyle: FontStyle.italic,
+                  color: AppTheme.gameColors
+                      .getTextColor(Theme.of(context).brightness)),
             ),
           ),
           Row(
@@ -104,7 +112,8 @@ class WordSizeToggle extends ConsumerWidget {
         child: Text(
           gameSettings.wordsize.toString(),
           style: TextStyle(
-            color: AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
+            color:
+                AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -159,7 +168,8 @@ class WordAttemptToggle extends ConsumerWidget {
         child: Text(
           difftext,
           style: TextStyle(
-            color: AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
+            color:
+                AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
             fontWeight: FontWeight.bold,
             fontSize: 13,
           ),

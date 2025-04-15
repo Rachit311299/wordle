@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wordle/providers/game_state_provider.dart';
 import 'package:wordle/theme/theme_data.dart';
 import 'package:wordle/widgets/wordle_grid_element.dart';
 
@@ -74,34 +76,66 @@ class CorrectWordOverlay {
                             children: List.generate(
                               correctWord.length,
                               (index) => WordleGridElement(
-                                pos: index,
-                                letter: correctWord[index],
-                                attempted: true,
-                                color: AppTheme.gameColors.incorrectColor
-                              ),
+                                  pos: index,
+                                  letter: correctWord[index],
+                                  attempted: true,
+                                  color: AppTheme.gameColors.incorrectColor),
                             ),
                           ),
                           const SizedBox(height: 30),
-                          TextButton(
-                            onPressed: hide,
-                            style: TextButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  // Call resetGame and hide the overlay
+                                  final gameStateNotifier =
+                                      ProviderScope.containerOf(context)
+                                          .read(gameStateProvider.notifier);
+                                  gameStateNotifier.resetGame();
+                                  hide();
+                                },
+                                style: TextButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Restart',
+                                  style: TextStyle(
+                                    color: theme.brightness == Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
+                              const SizedBox(width: 12),
+                              TextButton(
+                                onPressed: hide,
+                                style: TextButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Close',
+                                  style: TextStyle(
+                                    color: theme.brightness == Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              'Close',
-                              style: TextStyle(
-                                color: theme.brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                                    
-                              ),
-                            ),
+                            ],
                           ),
                         ],
                       ),

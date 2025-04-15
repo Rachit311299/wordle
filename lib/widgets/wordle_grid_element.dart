@@ -151,29 +151,30 @@ class _WordleGridElementState extends State<WordleGridElement>
           : AppTheme.gameColors.getTextColor(Theme.of(context).brightness),
     );
 
+    final staticChild = Container(
+      width: 50,
+      height: 50,
+      alignment: Alignment.center,
+      padding: _containerPadding,
+      margin: _containerMargin,
+      decoration: decoration,
+      child: Text(
+        displayLetter.toUpperCase(),
+        style: textStyle,
+      ),
+    );
+
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _controller,
+        child: staticChild,
         builder: (context, child) {
           final scale = widget.letter.isEmpty ? 1.0 : _scaleAnimation.value;
-
           return Transform.scale(
             scale: scale,
             child: child,
           );
         },
-        child: Container(
-          width: 50,
-          height: 50,
-          alignment: Alignment.center,
-          padding: _containerPadding,
-          margin: _containerMargin,
-          decoration: decoration,
-          child: Text(
-            displayLetter.toUpperCase(),
-            style: textStyle,
-          ),
-        ),
       ),
     );
   }

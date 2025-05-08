@@ -3,7 +3,7 @@ name: Flutter Web
 on:
   push:
     branches:
-      - master
+      - main
 
 permissions:
   contents: write  # Grant write permission to GITHUB_TOKEN
@@ -13,17 +13,28 @@ jobs:
     name: Build Web and Deploy
     runs-on: ubuntu-latest
     env:
-      BASE_HREF: /wordle/
+      BASE_HREF: /cycles/
     steps:
       - uses: actions/checkout@v3
+      
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.3'
+          flutter-version: '3.7.0'
           channel: 'stable'
+          
+      # Check Flutter and Dart versions
+      - run: flutter --version
+      
+      # Get packages
+      - run: flutter pub get
+      
+      # Build web
       - run: flutter build web --release --web-renderer html --base-href $BASE_HREF
+      
+      # Deploy to GitHub Pages
       - name: Deploy gh-pages
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web

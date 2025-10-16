@@ -24,6 +24,7 @@ class _WordleRowState extends ConsumerState<WordleRow> with SingleTickerProvider
   late AnimationController _waveController;
   late List<Animation<double>> _waveAnimations;
   bool _isCorrectWord = false;
+  bool _hasAnimated = false; // Prevent animation replay
   
   @override
   void initState() {
@@ -34,6 +35,16 @@ class _WordleRowState extends ConsumerState<WordleRow> with SingleTickerProvider
       vsync: this,
     );
     // We'll set up state in build()
+  }
+
+  @override
+  void didUpdateWidget(WordleRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reset animation flag when game resets (attempted changes from true to false)
+    if (oldWidget.rowIndex == widget.rowIndex && 
+        ref.read(gameStateProvider).attempted == 0) {
+      _hasAnimated = false;
+    }
   }
 
   void _setupWaveAnimations() {
@@ -98,11 +109,12 @@ class _WordleRowState extends ConsumerState<WordleRow> with SingleTickerProvider
       // Check if this is the correct word
       _isCorrectWord = word == correctWord;
       
-      // Check if game is over to trigger animation
+      // Check if game is over to trigger animation (only once)
       final gameState = ref.read(gameStateProvider);
-      if (_isCorrectWord && gameState.gameOver && !_waveController.isAnimating) {
+      if (_isCorrectWord && gameState.gameOver && !_waveController.isAnimating && !_hasAnimated) {
         _waveController.reset();
         _waveController.forward();
+        _hasAnimated = true;
       }
     } else {
       colors = List.filled(wordsize, null);
@@ -139,8 +151,9 @@ class _WordleRowState extends ConsumerState<WordleRow> with SingleTickerProvider
     _initializeRow();
 
     final isGameOver = gameState.gameOver;
-    if (isGameOver && _isCorrectWord && !_waveController.isAnimating) {
+    if (isGameOver && _isCorrectWord && !_waveController.isAnimating && !_hasAnimated) {
       _waveController.forward();
+      _hasAnimated = true;
     }
 
     return RepaintBoundary(

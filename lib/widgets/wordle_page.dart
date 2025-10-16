@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:wordle/widgets/wordle_keyboard.dart';
 import 'package:wordle/widgets/wordle_grid.dart';
 import 'package:wordle/widgets/wordle_title_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wordle/providers/history_provider.dart';
 
-class WordlePage extends StatelessWidget {
+class WordlePage extends ConsumerWidget {
   const WordlePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenWidth = MediaQuery.of(context).size.width;
+    // mark a new game start on page build (lightweight)
+    ref.read(historyProvider.notifier).markGameStart();
     
-    Widget content = SafeArea(
+    final gameContent = SafeArea(
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
@@ -38,6 +42,8 @@ class WordlePage extends StatelessWidget {
       ),
     );
 
+    Widget content = gameContent;
+
     if (screenWidth > 1366) {
       content = Center(
         child: ConstrainedBox(
@@ -50,7 +56,7 @@ class WordlePage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.9),//change the opacity of the background colors
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.9),
       body: content,
     );
   }

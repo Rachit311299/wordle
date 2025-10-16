@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/widgets/wordle_page.dart';
 import 'package:wordle/providers/theme_provider.dart';
 import 'package:wordle/theme/theme_data.dart';
+import 'package:wordle/data/wordle_repo.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,8 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
+    // Preload words for faster gameplay
+    preloadWords();
     runApp(const ProviderScope(child: MyApp()));
   });
 }

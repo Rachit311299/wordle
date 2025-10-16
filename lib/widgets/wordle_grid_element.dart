@@ -38,6 +38,10 @@ class _WordleGridElementState extends State<WordleGridElement>
   static const Duration _mobileAnimationDuration = Duration(milliseconds: 300);
   static const EdgeInsets _containerPadding = EdgeInsets.all(10);
   static const EdgeInsets _containerMargin = EdgeInsets.all(2);
+  static const TextStyle _textStyle = TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+  );
 
   @override
   void initState() {
@@ -143,9 +147,7 @@ class _WordleGridElementState extends State<WordleGridElement>
             ? _previousLetter
             : widget.letter;
 
-    final textStyle = TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.bold,
+    final textStyle = _textStyle.copyWith(
       color: widget.attempted
           ? Colors.white
           : AppTheme.gameColors.getTextColor(Theme.of(context).brightness),

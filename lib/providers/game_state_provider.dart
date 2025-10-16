@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wordle/data/wordle_repo.dart';
 import 'package:wordle/providers/game_settings_provider.dart';
+import 'package:wordle/providers/history_provider.dart';
 import 'package:wordle/theme/theme_data.dart';
 import 'package:wordle/widgets/correctword_overlay.dart';
 import 'package:wordle/widgets/custom_toast.dart';
@@ -210,6 +211,20 @@ class GameStateNotifier extends StateNotifier<GameState> {
           gameOver: true,
         );
 
+        // record history (win)
+        try {
+          final container = ProviderScope.containerOf(context);
+          final history = container.read(historyProvider.notifier);
+          history.addResult(
+            wordSize: state.settings.wordsize,
+            attemptsAllowed: state.settings.attempts,
+            attemptsUsed: state.attempted,
+            won: true,
+            correctWord: state.correctWord,
+            guesses: state.attempts.take(state.attempted).toList(),
+          );
+        } catch (_) {}
+
         // ConfettiOverlay.show(context);
         HapticFeedback.heavyImpact();
         CustomToast.show(
@@ -236,6 +251,20 @@ class GameStateNotifier extends StateNotifier<GameState> {
           shake: true,
         );
         HapticFeedback.heavyImpact();
+
+        // record history (loss)
+        try {
+          final container = ProviderScope.containerOf(context);
+          final history = container.read(historyProvider.notifier);
+          history.addResult(
+            wordSize: state.settings.wordsize,
+            attemptsAllowed: state.settings.attempts,
+            attemptsUsed: state.attempted,
+            won: false,
+            correctWord: state.correctWord,
+            guesses: state.attempts.take(state.attempted).toList(),
+          );
+        } catch (_) {}
         return;
       }
     } else if (key == "+") {

@@ -4,12 +4,15 @@ import 'package:wordle/providers/game_settings_provider.dart';
 import 'package:wordle/providers/theme_provider.dart';
 import 'package:wordle/theme/theme_data.dart';
 import 'package:wordle/providers/game_state_provider.dart';
+import 'package:wordle/widgets/history_dialog.dart';
 
 class WordleTitleBar extends ConsumerWidget {
   const WordleTitleBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isCompact = MediaQuery.of(context).size.width < 480;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -30,16 +33,129 @@ class WordleTitleBar extends ConsumerWidget {
                       .getTextColor(Theme.of(context).brightness)),
             ),
           ),
-          Row(
-            children: const [
-              WordSizeToggle(),
-              SizedBox(width: 5),
-              WordAttemptToggle(),
-              SizedBox(width: 5),
-              ThemeToggleButton(),
-            ],
-          ),
+          if (!isCompact)
+            Row(
+              children: [
+                const WordSizeToggle(),
+                const SizedBox(width: 5),
+                const WordAttemptToggle(),
+                const SizedBox(width: 5),
+                const ThemeToggleButton(),
+                const SizedBox(width: 5),
+                SizedBox(
+                  width: 50,
+                  height: 30,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: () => showHistoryDialog(context),
+                    child: Icon(
+                      Icons.history,
+                      size: 18,
+                      color: AppTheme.gameColors
+                          .getTextColor(Theme.of(context).brightness),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            _CollapsedActionsButton(),
         ],
+      ),
+    );
+  }
+}
+
+class _CollapsedActionsButton extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final iconColor = AppTheme.gameColors
+        .getTextColor(Theme.of(context).brightness);
+
+    return PopupMenuButton<int>(
+      tooltip: 'Actions',
+      offset: const Offset(0, 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      itemBuilder: (context) => [
+        PopupMenuItem<int>(
+          value: 1,
+          child: const SizedBox(
+            width: 180,
+            height: 30,
+            child: WordSizeToggle(),
+          ),
+        ),
+        PopupMenuItem<int>(
+          value: 2,
+          child: const SizedBox(
+            width: 180,
+            height: 30,
+            child: WordAttemptToggle(),
+          ),
+        ),
+        PopupMenuItem<int>(
+          value: 3,
+          child: const SizedBox(
+            width: 180,
+            height: 30,
+            child: ThemeToggleButton(),
+          ),
+        ),
+        PopupMenuItem<int>(
+          value: 4,
+          child: SizedBox(
+            width: 180,
+            height: 30,
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.zero,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                showHistoryDialog(context);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history, size: 18, color: iconColor),
+                  const SizedBox(width: 6),
+                  Text(
+                    'History',
+                    style: TextStyle(color: iconColor, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+      child: SizedBox(
+        width: 50,
+        height: 30,
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            side: BorderSide(color: Theme.of(context).colorScheme.outline),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: EdgeInsets.zero,
+          ),
+          onPressed: null,
+           child: Icon(Icons.settings, size: 18, color: iconColor),
+        ),
       ),
     );
   }

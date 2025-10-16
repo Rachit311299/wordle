@@ -59,11 +59,12 @@ class GameStateNotifier extends StateNotifier<GameState> {
   final Random rng = Random();
 
   Future<void> resetGame() async {
-    final wordData = await loadWords(state.settings.wordsize);
-    final words = wordData["data"]!;
-    final vword = wordData["vdata"]!;
-    final newCorrectWord = words[rng.nextInt(words.length - 1)];
-    state = GameState(
+    try {
+      final wordData = await loadWords(state.settings.wordsize);
+      final words = wordData["data"]!;
+      final vword = wordData["vdata"]!;
+      final newCorrectWord = words[rng.nextInt(words.length)];
+      state = GameState(
       settings: state.settings,
       validWords: words,
       wordBank: vword,
@@ -73,7 +74,12 @@ class GameStateNotifier extends StateNotifier<GameState> {
       gameOver: false,
       keyStates: {},
       submittedColors: [],
-    );
+      );
+    } catch (e) {
+      // On failure, keep previous state but mark game over and inform user if possible later
+      state = state.clone(gameOver: true);
+      debugPrint('Failed to reset game: $e');
+    }
   }
 
   GameStateNotifier(GameSettings settings)
@@ -87,21 +93,28 @@ class GameStateNotifier extends StateNotifier<GameState> {
         ));
 
   Future<void> updateWords() async {
-    final wordData = await loadWords(state.settings.wordsize);
+    try {
+      final wordData = await loadWords(state.settings.wordsize);
+      final words = wordData["data"]!;
+      final vword = wordData["vdata"]!;
 
-    final words = wordData["data"]!;
-    final vword = wordData["vdata"]!;
-
-    state = state.clone(
-      validWords: words,
-      wordBank: vword,
-      correctWord: words[rng.nextInt(words.length - 1)],
-    );
+      state = state.clone(
+        validWords: words,
+        wordBank: vword,
+        correctWord: words[rng.nextInt(words.length)],
+      );
+    } catch (e) {
+      debugPrint('Failed to update words: $e');
+    }
   }
 
   void newCorrectWord() {
+    if (state.validWords.isEmpty) {
+      debugPrint('No valid words available to pick a new correct word.');
+      return;
+    }
     state = state.clone(
-      correctWord: state.validWords[rng.nextInt(state.validWords.length - 1)],
+      correctWord: state.validWords[rng.nextInt(state.validWords.length)],
     );
   }
 
@@ -182,11 +195,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
           List.from(state.submittedColors)..add(colors);
 
       // Update state in a single clone to ensure atomic update
+      // Keep attempts list mutable for further typing/backspacing in next rows
       state = state.clone(
         attempted: state.attempted + 1,
         submittedColors: newSubmittedColors,
-        attempts:
-            List.from(attempts), // Ensure attempts list is properly cloned
+        attempts: List<String>.from(attempts),
       );
 
       _updateKeyStates(currentAttempt);

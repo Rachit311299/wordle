@@ -123,17 +123,22 @@ class _WordleRowState extends ConsumerState<WordleRow> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    // Read relevant state from providers using .select
-    wordsize = ref.watch(GameSettingsProvider.select((s) => s.wordsize));
-    word = ref.watch(gameStateProvider.select((s) => s.attempts.length > widget.rowIndex ? s.attempts[widget.rowIndex] : ""));
-    correctWord = ref.watch(gameStateProvider.select((s) => s.correctWord));
-    attempted = ref.watch(gameStateProvider.select((s) => s.attempted > widget.rowIndex));
+    // Reduce rebuilds by consolidating provider reads
+    final settings = ref.watch(GameSettingsProvider);
+    final gameState = ref.watch(gameStateProvider);
+
+    wordsize = settings.wordsize;
+    attempted = gameState.attempted > widget.rowIndex;
+    correctWord = gameState.correctWord;
+    word = gameState.attempts.length > widget.rowIndex
+        ? gameState.attempts[widget.rowIndex]
+        : "";
 
     // Setup wave animations and row state
     _setupWaveAnimations();
     _initializeRow();
 
-    final isGameOver = ref.watch(gameStateProvider.select((s) => s.gameOver));
+    final isGameOver = gameState.gameOver;
     if (isGameOver && _isCorrectWord && !_waveController.isAnimating) {
       _waveController.forward();
     }
